@@ -1,17 +1,23 @@
-/* ===== IVY INTRO — VOICE + LYRICS ===== */
-const ivyLines = [
-    "Hello…",
-    "I'm Ivy.",
-    "I'll be your guide tonight.",
-    "",
-    "Welcome to the world of",
-    "The Obsessn.",
-    "",
-    "No genre. No rules.",
-    "Just raw obsession.",
-    "",
-    "Stay.",
-    "Let me show you everything."
+/* ===== IVY INTRO — SYNCED AUDIO + LYRICS ===== */
+
+// Each line maps to a timestamp in ivy-intro.mp3
+// Timestamps determined by audio analysis (pydub silence detection)
+const ivyCues = [
+    { time: 1.5,  text: "Hello…" },
+    { time: 4.6,  text: "I'm Ivy." },
+    { time: 6.4,  text: "I'll be your guide tonight." },
+    { time: 12.0, text: null },               // clear — dramatic pause
+    { time: 12.7, text: "Welcome to the world of" },
+    { time: 16.0, text: "The Obsessn." },
+    { time: 21.5, text: null },               // clear
+    { time: 22.7, text: "No genre." },
+    { time: 24.0, text: "No rules." },
+    { time: 28.5, text: null },               // clear
+    { time: 29.2, text: "Just raw obsession." },
+    { time: 33.0, text: null },               // clear
+    { time: 33.4, text: "Stay." },
+    { time: 40.4, text: "Let me show you everything." },
+    { time: 47.0, text: null },               // final clear before transition
 ];
 
 const ivyLyricsEl = document.getElementById('ivy-lyrics');
@@ -20,7 +26,8 @@ const ivySpeaking = document.getElementById('ivy-speaking');
 const ivyWaveform = document.getElementById('ivy-waveform');
 const mainSite = document.getElementById('main-site');
 let ivyAborted = false;
-let ivySpeech = null;
+let ivyAudio = null;
+let ivyRAF = null;
 
 // Create waveform bars
 for (let i = 0; i < 20; i++) {
@@ -31,111 +38,114 @@ for (let i = 0; i < 20; i++) {
     ivyWaveform.appendChild(bar);
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+let displayedLines = [];
+let lastCueIndex = -1;
+
+function clearLines() {
+    displayedLines.forEach(el => el.classList.add('fading'));
+    setTimeout(() => {
+        displayedLines.forEach(el => el.remove());
+        displayedLines = [];
+    }, 500);
 }
 
-// Pick the best female voice available
-function getFemaleVoice() {
-    const voices = speechSynthesis.getVoices();
-    // Priority: look for specific premium female voices
-    const preferred = [
-        'Samantha', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Victoria',
-        'Zira', 'Hazel', 'Susan', 'Google UK English Female',
-        'Microsoft Zira', 'Google US English'
-    ];
-    for (const name of preferred) {
-        const v = voices.find(v => v.name.includes(name));
-        if (v) return v;
+function showLine(text) {
+    // Dim previous lines
+    displayedLines.forEach(l => {
+        l.classList.remove('highlight');
+        l.style.opacity = '0.35';
+    });
+
+    const el = document.createElement('div');
+    el.classList.add('ivy-line');
+    el.textContent = text;
+    ivyLyricsEl.appendChild(el);
+    displayedLines.push(el);
+
+    // Trigger animation on next frame
+    requestAnimationFrame(() => {
+        el.classList.add('visible', 'highlight');
+    });
+}
+
+function syncLyrics() {
+    if (ivyAborted || !ivyAudio) return;
+
+    const t = ivyAudio.currentTime;
+
+    // Find which cue we should be at
+    for (let i = ivyCues.length - 1; i >= 0; i--) {
+        if (t >= ivyCues[i].time && i > lastCueIndex) {
+            lastCueIndex = i;
+            const cue = ivyCues[i];
+
+            if (cue.text === null) {
+                clearLines();
+            } else {
+                showLine(cue.text);
+            }
+            break;
+        }
     }
-    // Fallback: any English female voice
-    const english = voices.filter(v => v.lang.startsWith('en'));
-    if (english.length > 0) return english[0];
-    return voices[0] || null;
+
+    // Check if audio ended
+    if (ivyAudio.ended || t >= 50) {
+        setTimeout(() => endIvy(), 800);
+        return;
+    }
+
+    ivyRAF = requestAnimationFrame(syncLyrics);
 }
 
-function speakLine(text) {
-    return new Promise((resolve) => {
-        if (ivyAborted || !text.trim()) { resolve(); return; }
-        if (!('speechSynthesis' in window)) { resolve(); return; }
+function startIvy() {
+    ivyAudio = new Audio('ivy-intro.mp3');
+    ivyAudio.volume = 0.95;
 
-        const utter = new SpeechSynthesisUtterance(text);
-        const voice = getFemaleVoice();
-        if (voice) utter.voice = voice;
-        utter.rate = 0.85;
-        utter.pitch = 1.1;
-        utter.volume = 0.9;
-        utter.onend = () => resolve();
-        utter.onerror = () => resolve();
-        ivySpeech = utter;
-        speechSynthesis.speak(utter);
-    });
+    ivyAudio.addEventListener('canplay', () => {
+        if (ivyAborted) return;
+        ivyAudio.play().then(() => {
+            ivySpeaking.classList.add('active');
+            ivyWaveform.classList.add('active');
+            syncLyrics();
+        }).catch(() => {
+            // Autoplay blocked — fallback to text-only mode
+            runFallback();
+        });
+    }, { once: true });
+
+    ivyAudio.addEventListener('error', () => {
+        runFallback();
+    }, { once: true });
+
+    // Safety timeout — if audio fails to load in 3s, fallback
+    setTimeout(() => {
+        if (lastCueIndex === -1 && !ivyAborted) {
+            runFallback();
+        }
+    }, 3000);
 }
 
-async function runIvy() {
-    // Wait for voices to load
-    await new Promise(r => {
-        if (speechSynthesis.getVoices().length) { r(); return; }
-        speechSynthesis.onvoiceschanged = () => r();
-        setTimeout(r, 1500); // fallback
-    });
-
-    await sleep(600);
+// Fallback: text-only mode if audio can't play
+async function runFallback() {
+    if (ivyAborted) return;
     ivySpeaking.classList.add('active');
     ivyWaveform.classList.add('active');
 
-    let displayedLines = [];
-
-    for (let i = 0; i < ivyLines.length; i++) {
+    const lines = ivyCues.filter(c => c.text !== null);
+    for (const cue of lines) {
         if (ivyAborted) break;
-        const line = ivyLines[i];
-
-        if (!line.trim()) {
-            // Empty line = dramatic pause + clear previous
-            await sleep(600);
-            // Fade out all current lines
-            displayedLines.forEach(el => el.classList.add('fading'));
-            await sleep(500);
-            displayedLines.forEach(el => el.remove());
-            displayedLines = [];
-            continue;
+        showLine(cue.text);
+        await new Promise(r => setTimeout(r, 1200 + cue.text.length * 35));
+        // Check if next cue is a clear
+        const idx = ivyCues.indexOf(cue);
+        if (idx < ivyCues.length - 1 && ivyCues[idx + 1].text === null) {
+            await new Promise(r => setTimeout(r, 400));
+            clearLines();
+            await new Promise(r => setTimeout(r, 300));
         }
-
-        // Create lyric line
-        const el = document.createElement('div');
-        el.classList.add('ivy-line');
-        el.textContent = line;
-        ivyLyricsEl.appendChild(el);
-        displayedLines.push(el);
-
-        // Fade previous lines slightly
-        displayedLines.forEach((l, idx) => {
-            if (idx < displayedLines.length - 1) {
-                l.classList.remove('highlight');
-                l.style.opacity = '0.4';
-            }
-        });
-
-        // Animate in + highlight current
-        await sleep(50);
-        el.classList.add('visible', 'highlight');
-
-        // Speak
-        if ('speechSynthesis' in window && line.trim()) {
-            await speakLine(line);
-        } else {
-            // Fallback timing if no speech
-            await sleep(800 + line.length * 30);
-        }
-
-        if (ivyAborted) break;
-        await sleep(200);
     }
-
     if (!ivyAborted) {
-        ivySpeaking.classList.remove('active');
-        ivyWaveform.classList.remove('active');
-        await sleep(1000);
+        await new Promise(r => setTimeout(r, 1000));
         endIvy();
     }
 }
@@ -143,7 +153,8 @@ async function runIvy() {
 function endIvy() {
     if (ivyAborted) return;
     ivyAborted = true;
-    if (ivySpeech) speechSynthesis.cancel();
+    if (ivyAudio) { ivyAudio.pause(); ivyAudio = null; }
+    if (ivyRAF) cancelAnimationFrame(ivyRAF);
     ivySpeaking.classList.remove('active');
     ivyWaveform.classList.remove('active');
     ivyOverlay.classList.add('fade-out');
@@ -156,7 +167,8 @@ document.addEventListener('keydown', (e) => {
     if (!ivyAborted && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) endIvy();
 });
 
-runIvy();
+// Start after a brief delay
+setTimeout(startIvy, 500);
 
 /* ===== PARTICLE SYSTEM ===== */
 const canvas = document.getElementById('particle-canvas');
