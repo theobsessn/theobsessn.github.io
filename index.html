@@ -59,8 +59,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- IVY INTRO OVERLAY -->
-    <div id="ivy-overlay" class="ivy-overlay">
+    <!-- IVY GATE — requires user click to unlock audio -->
+    <div id="ivy-gate" class="ivy-gate">
+        <div class="ivy-scanlines"></div>
+        <div class="ivy-vignette"></div>
+        <div class="ivy-gate-content">
+            <img src="TheObsessn.PNG" alt="The Obsessn" class="ivy-gate-logo">
+            <div class="ivy-gate-text">THE OBSESSN</div>
+            <button id="ivy-enter-btn" class="ivy-enter-btn">
+                <span class="ivy-enter-icon">▶</span>
+                <span>Enter</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- IVY INTRO OVERLAY (shown after gate click) -->
+    <div id="ivy-overlay" class="ivy-overlay" style="display:none;">
         <div class="ivy-scanlines"></div>
         <div class="ivy-vignette"></div>
         <div class="ivy-waveform" id="ivy-waveform"></div>

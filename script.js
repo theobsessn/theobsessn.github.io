@@ -3,20 +3,20 @@
 // Each line maps to a timestamp in ivy-intro.mp3
 // Timestamps determined by audio analysis (pydub silence detection)
 const ivyCues = [
-    { time: 1.5,  text: "Hello…" },
-    { time: 4.6,  text: "I'm Ivy." },
-    { time: 6.4,  text: "I'll be your guide tonight." },
-    { time: 12.0, text: null },               // clear — dramatic pause
-    { time: 12.7, text: "Welcome to the world of" },
-    { time: 16.0, text: "The Obsessn." },
-    { time: 21.5, text: null },               // clear
-    { time: 22.7, text: "No genre." },
-    { time: 24.0, text: "No rules." },
-    { time: 28.5, text: null },               // clear
-    { time: 29.2, text: "Just raw obsession." },
-    { time: 33.0, text: null },               // clear
-    { time: 33.4, text: "Stay." },
-    { time: 40.4, text: "Let me show you everything." },
+    { time: 1.5, text: "Hello…" },
+    { time: 4.5, text: "I'm Ivy." },
+    { time: 9.4, text: "I'll be your guide tonight." },
+    { time: 14.0, text: null },               // clear — dramatic pause
+    { time: 17.7, text: "Welcome to the world of…" },
+    { time: 22.7, text: "The Obsessn" },
+    { time: 25.4, text: null },               // clear
+    { time: 27.4, text: "No genre." },
+    { time: 29.2, text: "No rules." },
+    { time: 30.2, text: null },               // clear
+    { time: 31.2, text: "Just raw obsession." },
+    { time: 34.0, text: null },               // clear
+    { time: 35.4, text: "Stay." },
+    { time: 38.5, text: "Let me show you everything." },
     { time: 47.0, text: null },               // final clear before transition
 ];
 
@@ -98,34 +98,27 @@ function syncLyrics() {
 }
 
 function startIvy() {
+    ivyOverlay.style.display = 'flex';
+
     ivyAudio = new Audio('ivy-intro.mp3');
     ivyAudio.volume = 0.95;
 
-    ivyAudio.addEventListener('canplay', () => {
-        if (ivyAborted) return;
-        ivyAudio.play().then(() => {
-            ivySpeaking.classList.add('active');
-            ivyWaveform.classList.add('active');
-            syncLyrics();
-        }).catch(() => {
-            // Autoplay blocked — fallback to text-only mode
-            runFallback();
-        });
-    }, { once: true });
+    // Play immediately — we're inside a user gesture (gate click) so browsers allow it
+    ivyAudio.play().then(() => {
+        ivySpeaking.classList.add('active');
+        ivyWaveform.classList.add('active');
+        syncLyrics();
+    }).catch(() => {
+        // Extremely rare fallback
+        runFallback();
+    });
 
     ivyAudio.addEventListener('error', () => {
         runFallback();
     }, { once: true });
-
-    // Safety timeout — if audio fails to load in 3s, fallback
-    setTimeout(() => {
-        if (lastCueIndex === -1 && !ivyAborted) {
-            runFallback();
-        }
-    }, 3000);
 }
 
-// Fallback: text-only mode if audio can't play
+// Fallback: text-only mode if audio somehow can't play
 async function runFallback() {
     if (ivyAborted) return;
     ivySpeaking.classList.add('active');
@@ -136,7 +129,6 @@ async function runFallback() {
         if (ivyAborted) break;
         showLine(cue.text);
         await new Promise(r => setTimeout(r, 1200 + cue.text.length * 35));
-        // Check if next cue is a clear
         const idx = ivyCues.indexOf(cue);
         if (idx < ivyCues.length - 1 && ivyCues[idx + 1].text === null) {
             await new Promise(r => setTimeout(r, 400));
@@ -162,13 +154,24 @@ function endIvy() {
     setTimeout(() => { ivyOverlay.style.display = 'none'; }, 900);
 }
 
+// Skip listeners
 ivyOverlay.addEventListener('click', () => { if (!ivyAborted) endIvy(); });
 document.addEventListener('keydown', (e) => {
     if (!ivyAborted && (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ')) endIvy();
 });
 
-// Start after a brief delay
-setTimeout(startIvy, 500);
+// Gate: user clicks Enter → audio starts (user gesture unlocks audio on all browsers)
+const ivyGate = document.getElementById('ivy-gate');
+const ivyEnterBtn = document.getElementById('ivy-enter-btn');
+
+ivyEnterBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ivyGate.classList.add('hidden');
+    setTimeout(() => {
+        ivyGate.style.display = 'none';
+        startIvy();
+    }, 600);
+});
 
 /* ===== PARTICLE SYSTEM ===== */
 const canvas = document.getElementById('particle-canvas');
