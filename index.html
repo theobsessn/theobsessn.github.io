@@ -59,16 +59,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- IVY GATE — requires user click to unlock audio -->
+    <!-- IVY GATE — minimal, feels like Ivy is already here -->
     <div id="ivy-gate" class="ivy-gate">
         <div class="ivy-scanlines"></div>
         <div class="ivy-vignette"></div>
         <div class="ivy-gate-content">
-            <img src="TheObsessn.PNG" alt="The Obsessn" class="ivy-gate-logo">
-            <div class="ivy-gate-text">THE OBSESSN</div>
+            <div class="ivy-indicator" style="opacity:1; animation:none;">
+                <span class="ivy-dot"></span>
+                <span class="ivy-label">IVY</span>
+            </div>
             <button id="ivy-enter-btn" class="ivy-enter-btn">
-                <span class="ivy-enter-icon">▶</span>
-                <span>Enter</span>
+                <span>tap to listen</span>
             </button>
         </div>
     </div>
