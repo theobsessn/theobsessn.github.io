@@ -43,6 +43,9 @@ let lastCueIndex = -1;
 
 function clearLines() {
     displayedLines.forEach(el => el.classList.add('fading'));
+    // Waveform goes idle during pauses
+    ivyWaveform.classList.add('idle');
+    ivySpeaking.classList.remove('active');
     setTimeout(() => {
         displayedLines.forEach(el => el.remove());
         displayedLines = [];
@@ -50,6 +53,10 @@ function clearLines() {
 }
 
 function showLine(text) {
+    // Waveform comes alive when speaking
+    ivyWaveform.classList.remove('idle');
+    ivySpeaking.classList.add('active');
+
     // Dim previous lines
     displayedLines.forEach(l => {
         l.classList.remove('highlight');
