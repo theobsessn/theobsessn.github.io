@@ -2,16 +2,16 @@
 const ivyLines = [
     "Hello…",
     "I'm Ivy.",
+    "I'll be your guide tonight.",
     "",
     "Welcome to the world of",
     "The Obsessn.",
     "",
-    "An artist with no defined genre…",
-    "just following whatever feels real",
-    "in the moment.",
+    "No genre. No rules.",
+    "Just raw obsession.",
     "",
-    "Stay a while.",
-    "Let me show you."
+    "Stay.",
+    "Let me show you everything."
 ];
 
 const ivyLyricsEl = document.getElementById('ivy-lyrics');
