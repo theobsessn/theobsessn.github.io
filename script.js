@@ -102,18 +102,40 @@ function startIvy() {
 
     ivyAudio = new Audio('ivy-intro.mp3');
     ivyAudio.volume = 0.95;
+    ivyAudio.preload = 'auto';
 
-    // Play immediately — we're inside a user gesture (gate click) so browsers allow it
-    ivyAudio.play().then(() => {
-        ivySpeaking.classList.add('active');
-        ivyWaveform.classList.add('active');
-        syncLyrics();
-    }).catch(() => {
-        // Extremely rare fallback
-        runFallback();
-    });
+    // Show a subtle loading state while audio buffers
+    ivySpeaking.classList.add('active');
+
+    // Wait until browser has enough data to play through without stalling
+    ivyAudio.addEventListener('canplaythrough', () => {
+        if (ivyAborted) return;
+
+        ivyAudio.play().then(() => {
+            ivyWaveform.classList.add('active');
+            syncLyrics();
+        }).catch(() => {
+            runFallback();
+        });
+    }, { once: true });
+
+    // Force the browser to start loading
+    ivyAudio.load();
+
+    // Timeout fallback: if audio takes too long (>8s), run text-only
+    const loadTimeout = setTimeout(() => {
+        if (ivyAborted) return;
+        if (ivyAudio.readyState < 4) {
+            ivyAudio.pause();
+            ivyAudio = null;
+            runFallback();
+        }
+    }, 8000);
+
+    ivyAudio.addEventListener('canplaythrough', () => clearTimeout(loadTimeout), { once: true });
 
     ivyAudio.addEventListener('error', () => {
+        clearTimeout(loadTimeout);
         runFallback();
     }, { once: true });
 }
