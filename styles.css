@@ -78,7 +78,10 @@
 
   /* Space */
   --gut: clamp(1.25rem, 4vw, 4rem);
-  --sec: clamp(4.5rem, 8.5vw, 10rem);
+  /* Was clamp(4.5rem, 8.5vw, 10rem) = 245px of stacked padding between two
+     sections. With the invented sections removed the page is 3 sections long
+     and that much air read as emptiness, not rhythm. */
+  --sec: clamp(3.25rem, 6vw, 7rem);
   --maxw: 1440px;
   /* 52ch, not 62ch. `ch` is the width of the ZERO glyph, and in this geometric sans a
      "0" is ~12.4px against an average prose character of ~8.3px — so "62ch" was not 62
@@ -1395,7 +1398,10 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-height: clamp(240px, 30vw, 320px);
+  /* Sized for what the card now holds: a brand mark and a name. The previous
+     floor (240-320px) was set when each card also carried a description line;
+     without it the box was 320px tall around ~79px of ink. */
+  min-height: clamp(150px, 13vw, 200px);
   padding: clamp(1.4rem, 3vw, 2rem);
   border-radius: var(--r-lg);
   border: 1px solid var(--hairline);
@@ -1561,7 +1567,8 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
-  min-height: clamp(180px, 22vw, 232px);
+  /* Same reason as .plat above — mark, name, handle and nothing else. */
+  min-height: clamp(140px, 12vw, 180px);
   padding: clamp(1.3rem, 2.8vw, 1.8rem);
   border-radius: var(--r-lg);
   border: 1px solid var(--hairline);
@@ -1651,8 +1658,8 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
    These floors hold the desktop ratio (~0.72 and ~0.54) at phone width instead
    of drifting, so the framing survives and the empty scroll goes away. */
 @media (max-width: 480px) {
-  .plat { min-height: 200px; }
-  .social { min-height: 152px; }
+  .plat { min-height: 156px; }
+  .social { min-height: 138px; }
 }
 
 /* ---------- 17. FOOTER ---------- */
