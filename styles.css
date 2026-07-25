@@ -1896,13 +1896,19 @@ so the dark theme would send
   .btn::before { display: none !important; }
 
   /* The footer carries a near-opaque scrim so it never competes with the
-     atmosphere behind it. On paper there is no atmosphere, and the scrim is the
-     one dark background that survives into print — the rest of the page is
-     already neutralised above. With "Background graphics" ticked it printed as a
-     full-width near-black slab that swallowed its own text: measured 2.01:1 for
-     "Stay kind. Stay obsessed.", 1.77:1 for the button and 2.25:1 for the legal
-     line, against the 4.5:1 AA needs. It also dumped toner across a whole page. */
-  .footer { background: none !important; }
+     atmosphere behind it. On paper there is no atmosphere, and with "Background
+     graphics" ticked it printed as a full-width near-black slab that swallowed its
+     own text — measured as low as 1.77:1 against the 4.5:1 AA needs — and dumped
+     toner across a whole page.
+
+     .pullquote needs the same treatment for the same reason. The token overrides at
+     the top of this block (--surface-1 / --bg-card -> transparent) neutralise every
+     other surface, but .pullquote re-declares the whole `background` shorthand with
+     a crimson radial gradient, so the token never reaches it. Measured in print
+     media: it was the ONLY element on the page still computing a background-image,
+     printing the quote on a pink wash. */
+  .footer,
+  .pullquote { background: none !important; }
 
   /* A printed link is useless without its destination. This was enumerated by class and
      so it missed the two most important links on the sheet: BOTH "Listen on Spotify"
