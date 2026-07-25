@@ -1,5 +1,5 @@
 /* ============================================================
-   Motion — reveals, cursor, nav, marquee, tilt, counters.
+   Motion — reveals, cursor, nav, tilt, parallax.
    Everything is IntersectionObserver + rAF. No libraries.
    ============================================================ */
 
@@ -67,17 +67,8 @@ export function reveals() {
   const targets = $$('[data-reveal], [data-split-lines]');
   if (RM.matches) {
     targets.forEach((el) => el.classList.add('seen'));
-    $$('[data-count]').forEach((el) => (el.textContent = el.dataset.count + (el.dataset.suffix || '')));
     return;
   }
-
-  // Markup carries the real numbers so a no-JS visitor sees the truth;
-  // zero them only once we know we can animate them back up — and only if the
-  // value actually parses, so a malformed data-count keeps its authored text
-  // instead of silently becoming 0.
-  $$('[data-count]').forEach((el) => {
-    if (Number.isFinite(parseFloat(el.dataset.count))) el.textContent = '0';
-  });
 
   const io = new IntersectionObserver(
     (entries) => {
@@ -85,42 +76,13 @@ export function reveals() {
         if (!e.isIntersecting) return;
         e.target.classList.add('seen');
         io.unobserve(e.target);
-        $$('[data-count]', e.target).forEach(countUp);
-        if (e.target.matches('[data-count]')) countUp(e.target);
       });
     },
     { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
   );
   targets.forEach((el) => io.observe(el));
-
-  // counters that live outside a reveal wrapper
-  const cio = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      countUp(e.target);
-      cio.unobserve(e.target);
-    });
-  }, { threshold: 0.4 });
-  $$('[data-count]').forEach((el) => cio.observe(el));
 }
 
-const counted = new WeakSet();
-function countUp(el) {
-  if (counted.has(el)) return;
-  counted.add(el);
-  const target = parseFloat(el.dataset.count);
-  if (!Number.isFinite(target)) return;   // a bad data-count would render "NaN"
-  const suffix = el.dataset.suffix || '';
-  const dur = 1400;
-  const t0 = performance.now();
-  const step = (now) => {
-    const p = Math.min(1, (now - t0) / dur);
-    const eased = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(target * eased) + (p === 1 ? suffix : '');
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
 
 /* ---------- cursor ---------- */
 export function cursor() {
@@ -159,7 +121,7 @@ export function cursor() {
   addEventListener('pointerup', () => document.body.classList.remove('cursor-down'));
   addEventListener('pointerleave', () => document.body.classList.remove('cursor-live'));
 
-  const HOVER = 'a, button, [data-tilt], .tag, .era, input, iframe';
+  const HOVER = 'a, button, [data-tilt], .tag, input, iframe';
   addEventListener('pointerover', (e) => {
     if (e.target.closest?.(HOVER)) document.body.classList.add('cursor-hover');
   }, { passive: true });
@@ -212,78 +174,6 @@ export function tilts() {
   });
 }
 
-/* ---------- marquee ---------- */
-export function marquee() {
-  const rail = $('.marquee');
-  const track = $('#mq-a');
-  if (!rail || !track) return;
-
-  let width = 0;
-  const copies = [track];
-
-  const build = () => {
-    copies.slice(1).forEach((c) => c.remove());
-    copies.length = 1;
-    width = track.scrollWidth;
-    if (!width) return;
-    const need = Math.ceil(innerWidth / width) + 1;
-    for (let i = 0; i < need; i++) {
-      const c = track.cloneNode(true);
-      c.removeAttribute('id');
-      c.setAttribute('aria-hidden', 'true');
-      rail.appendChild(c);
-      copies.push(c);
-    }
-  };
-  build();
-  addEventListener('resize', build, { passive: true });
-
-  if (RM.matches) return;
-
-  let offset = 0;
-  let last = performance.now();
-  let lastY = scrollY;
-  let vel = 0;
-  let running = false;
-  let onScreen = true;
-
-  addEventListener('scroll', () => {
-    vel = scrollY - lastY;
-    lastY = scrollY;
-  }, { passive: true });
-
-  const loop = (now) => {
-    if (document.hidden || !onScreen) { running = false; return; }
-    const dt = Math.min(48, now - last);
-    last = now;
-    vel *= 0.9;
-    const speed = 0.035 + Math.min(0.22, Math.abs(vel) * 0.0035);
-    offset = (offset + dt * speed * 1.6) % (width || 1);
-    const skew = Math.max(-6, Math.min(6, vel * 0.14));
-    copies.forEach((c) => {
-      c.style.transform = `translate3d(${-offset}px,0,0) skewX(${skew.toFixed(2)}deg)`;
-    });
-    requestAnimationFrame(loop);
-  };
-  const start = () => {
-    if (running || document.hidden || !onScreen) return;
-    running = true;
-    last = performance.now();             // don't let a pause become one huge dt step
-    requestAnimationFrame(loop);
-  };
-
-  // Pause the ticker whenever the rail is off-screen — it rewrites a transform on
-  // every frame, and there is no reason to recalc style for a band nobody can see
-  // while they read the rest of the page. Measured ~120 writes/s off-screen.
-  new IntersectionObserver((entries) => {
-    onScreen = entries[entries.length - 1].isIntersecting;
-    if (onScreen) start();
-  }, { rootMargin: '100px' }).observe(rail);
-
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) start();
-  });
-}
 
 /* ---------- nav ---------- */
 export function nav() {

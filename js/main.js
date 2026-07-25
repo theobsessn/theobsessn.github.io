@@ -4,7 +4,7 @@
 
 import { createAtmosphere } from './gl.js';
 import { createIvy } from './ivy.js';
-import { splitText, reveals, cursor, magnets, tilts, marquee, nav, parallax, chrome } from './motion.js';
+import { splitText, reveals, cursor, magnets, tilts, nav, parallax, chrome } from './motion.js';
 
 const $ = (s) => document.querySelector(s);
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -141,7 +141,6 @@ function revealSite() {
   // scroll animations only matter once the page is actually scrollable
   requestAnimationFrame(() => {
     reveals();
-    marquee();
     nav();
     tilts();
     magnets();
