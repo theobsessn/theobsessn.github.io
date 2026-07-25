@@ -33,13 +33,4 @@ Everything started to make sense. The music, the voice, the writing — it was n
 
 ## Website
 - Official: https://theobsessn.com
-- Sections: #top (home), #story (about), #eras (sound), #music (listen), #connect (follow)
-- Skip the intro with https://theobsessn.com/?nointro=1 ; replay it with https://theobsessn.com/?ivy=1
-- AI Assistant: Ivy — a cinematic voice that greets visitors, with lyrics synced to real audio
-
-## Key Facts
-- Active for nearly 20 years
-- Has played on stage with different bands
-- Multi-genre artist spanning heavy metal to synthwave
-- Values kindness above all
-- Music driven by genuine obsession and raw emotion
+- Sections: #top (home), #story (biography), #music (listen), #connect (follow)

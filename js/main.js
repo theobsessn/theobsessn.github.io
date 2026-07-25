@@ -240,7 +240,12 @@ const deepLink = location.hash && location.hash !== '#top';
 const params = new URLSearchParams(location.search);
 const forceSkip = params.has('nointro');
 const forceIntro = params.has('ivy');            // shareable "watch the intro" link
-const straightIn = !forceIntro && (deepLink || forceSkip || !!sessionStorage.getItem('obsessn:seen'));
+// The spoken intro is OFF the visitor path. Its script ("No genre. No rules. Just raw
+// obsession.") was written copy, not the artist's words, and the site is meant to carry
+// his Spotify/SoundCloud biography and nothing else. Everyone now lands directly on the
+// site; the intro only runs if someone deliberately asks for it with ?ivy=1. The gate,
+// ivy.js and ivy-intro.mp3 are left in place so it can be brought back with real words.
+const straightIn = !forceIntro;
 
 function openDirect() {
   el.gate.classList.add('dismissed');
