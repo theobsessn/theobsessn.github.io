@@ -478,6 +478,21 @@ so its hover (4.85:1) and rest (4.96:1) agree instead of hover being the weaker 
 Numbers above are **rendered pixels**, not token math — see the measurement note in
 "Things that look broken in a screenshot but aren't" before re-checking them.
 
+**The three content sections carry `aria-labelledby`, pointing at their own `<h2>`**
+A `<section>` with no accessible name is **not exposed as a landmark region**, so
+`#story`, `#music` and `#connect` were invisible to region navigation — a screen
+reader user could reach banner/nav/main/contentinfo and nothing in between. Each
+section now names itself from the heading already on the page (`story-title`,
+`music-title`, `connect-title`), so no new words were introduced to do it.
+
+Verified in the real accessibility tree, not inferred: all three report
+`role: region` with names `BIOGRAPHY` / `MUSIC` / `CONNECT`. The names survive
+`splitText()` shattering the heading into `<span class="split-line"><i>…</i></span>`,
+because name computation walks the referenced subtree's text. They come through
+uppercase because `text-transform` applies to the computed name — which is what
+you want here: it keeps the accessible name matching the visible label
+(WCAG 2.5.3). If you rename a section heading, move its `id` with it.
+
 **Every interactive element has a non-empty, unambiguous accessible name**
 Audited all 16 focusable elements: none missing a name, none sharing a name
 across different hrefs. Icon-only controls are handled — the nav logo carries
