@@ -10,7 +10,7 @@ styles.css      design tokens + all styling, incl. every @media preference block
 js/main.js      entry: preloader → gate → Ivy → site handoff
 js/gl.js        WebGL2 atmosphere (hand-written GLSL, no library)
 js/ivy.js       the spoken intro: audio, FFT, lyric cues
-js/motion.js    reveals, cursor, nav, marquee, tilt, parallax, counters
+js/motion.js    reveals, cursor, nav, tilt, parallax
 ivy-intro.mp3   Ivy's voice track (51.76s)
 assets/         logo derivatives, generated OG card, favicons
 ```
@@ -22,6 +22,36 @@ like `#music` skips it automatically.
 
 ---
 
+## The only words on this site are the artist's
+
+This is a standing constraint, not a style preference. The site carries the
+Spotify/SoundCloud **biography** and the factual link labels. Nothing else.
+
+An earlier build shipped a lot of written-for-the-build editorial and the artist
+asked for all of it out. Removed, and **not to be reintroduced**: a hero eyebrow
+("Artist — Nearly 20 Years"), a `20 / 5 Genres / ∞` stat row, a genre marquee
+ticker ("No Rules", "Raw Obsession"), an entire **Eras** section with five
+invented descriptions, numbered section labels (`01 — About`) and their notes,
+platform blurbs ("Stream all tracks"), a footer headline ("Stay kind. / Stay
+obsessed.") and its button, "Crafted with obsession · guided by Ivy", a "Now
+streaming" label, and an interview-style heading.
+
+Two consequences worth knowing before you "fix" something:
+
+- **The spoken intro is off the visitor path.** Its script — "No genre. No rules.
+  Just raw obsession." — was written copy too. Everyone lands directly on the
+  site; the gate, `js/ivy.js` and `ivy-intro.mp3` are all still here and still
+  work, reachable only with `?ivy=1`, so the feature can return **if** it is given
+  the artist's own words. `straightIn` in `js/main.js` is the single switch.
+- **The OG card is a generated image**, so removing copy from the HTML does not
+  remove it from link previews. `assets/og.jpg` carried the eyebrow for a while
+  after the site did not. Re-render it from `tools/og-card.html` whenever the
+  wording changes — see *Generated assets*.
+
+If new copy is genuinely wanted, it comes from the artist. Do not write it.
+
+---
+
 ## Making common edits
 
 Everything is plain HTML/CSS/JS — edit, save, reload. No build step.
@@ -29,18 +59,6 @@ Everything is plain HTML/CSS/JS — edit, save, reload. No build step.
 **Change the tagline** — `index.html`, `.hero-lede`. It also appears in the meta
 description, `og:description`, `twitter:description`, the JSON-LD `description`,
 and `llms.txt`. Change all of them together or they will disagree.
-
-**Add or edit an era** — copy a `.era` row in `index.html`. Bump `.era-no`, and
-give each new row a slightly larger `--d` so it reveals after the one above:
-
-```html
-<div class="era" data-reveal="left" style="--d:.30s">
-  <span class="era-no">06</span>
-  <h3 class="era-name">Name</h3>
-  <p class="era-desc">One line.</p>
-  <span class="era-arrow">↘</span>
-</div>
-```
 
 **Add a streaming platform** — copy a `.plat` card. `--plat` is that brand's
 colour and drives the icon, border and hover glow. Add the same URL to
@@ -73,7 +91,7 @@ in the comment above `CUES`.
 `styles.css`. `--crimson-text` is the small-text variant and is deliberately
 lighter so it clears WCAG AA; it is overridden again for `prefers-contrast: more`
 and for print. Re-check contrast after changing any of them — a dead selector
-once hid a 2.93:1 accent for the entire life of the marquee.
+once hid a 2.93:1 accent for the entire life of a section that shipped with it.
 
 **Swap the logo** — replace `TheObsessn.PNG`, then regenerate the derivatives:
 
@@ -285,7 +303,7 @@ main `clamp()` — a clamp floor is absolute and cannot know the card got narrow
 **`transform-origin: left center` on the `.plat-icon` / `.social-icon` hover zoom**
 `scale(1.08)` about the default centre grows a 42px icon by 3.36px, i.e. 1.68px on
 *each* side, so on hover the icon's left edge slid 1.68px out past `.plat-name` and
-`.plat-desc` and broke the single vertical rail the card is built on. Anchoring the
+`.plat-name` and broke the single vertical rail the card is built on. Anchoring the
 origin to the left keeps the identical zoom and lift while the rail holds: measured
 icon-vs-name delta 1.68px → 0.01px, and `iris look --hover .plat` stops reporting
 `almost-aligned`. Note this defect is invisible at rest — all three left edges are
@@ -304,13 +322,9 @@ skipped levels. `splitText()` shatters the h1 into ten per-character `.ch` spans
 across two lines, but the accessible name still computes to "The Obsessn" (the
 spans are plain inline `<span>`s and the spaces are preserved as space
 characters), so a screen reader announces the whole word, not the letters — no
-`aria-label` needed. One heading *was* wrong: the footer CTA is
-`Stay kind.<br>Stay obsessed.`, and a `<br>` contributes no separator to the
-accessible name, so it computed as "Stay kind.Stay obsessed." with no space
-between the sentences. The fix is a single space **before** the `<br>`
-(`Stay kind. <br>…`) — invisible, because trailing whitespace collapses at the
-end of a line box, but it restores the word boundary in the name. Do not "tidy"
-that space away.
+`aria-label` needed. A `<br>` inside a heading contributes no
+separator to the accessible name, so any future two-line heading needs a space
+*before* the `<br>` or the two sentences run together when read aloud.
 
 **The hovered `.plat-go` chip uses dark ink, not white**
 On hover the chip fills with the *platform's* own colour, and streaming brands are
@@ -465,15 +479,11 @@ Numbers above are **rendered pixels**, not token math — see the measurement no
 "Things that look broken in a screenshot but aren't" before re-checking them.
 
 **Every interactive element has a non-empty, unambiguous accessible name**
-Audited all 29: none missing a name, none sharing a name across different hrefs.
-Icon-only controls are handled — the nav logo carries `aria-label="The Obsessn —
-home"`, and all 9 `<svg>` brand marks plus the `→`/`↗`/`↘` glyph spans are
-`aria-hidden="true"` so they never read as "image" or "down-right arrow" inside a
-link. The one gap fixed here: the five `.era-arrow` (`↘`) spans lacked
-`aria-hidden` and would have been announced on each Eras row (they are a
-hover-only decoration — `opacity: 0` until `.era:hover`). The hero stat `∞` is
-deliberately *not* hidden: it is the value of the "Obsession" stat and reads
-correctly as "infinity, Obsession".
+Audited all 16 focusable elements: none missing a name, none sharing a name
+across different hrefs. Icon-only controls are handled — the nav logo carries
+`aria-label="The Obsessn — home"`, and all 9 `<svg>` marks plus the `→`/`↗` glyph
+spans are `aria-hidden="true"` so they never read as "image" or "right arrow"
+inside a link.
 
 **Touch: tap targets pass WCAG AA, and the browser tap-flash is suppressed**
 Measured every interactive element at 390px: the smallest is 30px, so all clear
@@ -501,9 +511,8 @@ afterwards changes nothing. Last measured, all correct:
 |---|---|---|
 | shader (mean pixel Δ over 2.2s) | 4.36 — animating | **0.000 — static** |
 | Ivy meter bar heights over 2.5s | changing | **byte-identical** |
-| marquee `animation-name` | running | `none` |
 | grain / smooth scroll | on / `smooth` | `none` / `auto` |
-| reveals fired | 30/30 | 30/30 |
+| reveals fired | 24/24 | 24/24 |
 
 Do not measure the shader with `readPixels` — without `preserveDrawingBuffer`
 the buffer is cleared after compositing and every sample comes back zero, which
@@ -670,15 +679,7 @@ moving, **0 in 1.5s once settled**, and it wakes on the next move (ring lands on
 target). The parallax loop already behaves well (scroll-driven, `ticking`-gated,
 IntersectionObserver-culled).
 
-**The marquee ticker pauses when scrolled off-screen.** It rewrites a
-`translate3d + skewX` transform every frame; left ungated it did so at ~120fps to
-a band ~3900px above the viewport for the whole reading session. An
-IntersectionObserver (`rootMargin: 100px`, so it wakes just before re-entering)
-stops the loop off-screen and restarts it with `last = performance.now()` so the
-gap never lands as one huge `dt` step. Verified by counting `style` writes on the
-track: ~119/s on-screen, **0 off-screen**, resumes cleanly (transform stays a
-valid `translate3d`, no `NaN`). It only *looks* like it must run forever — the
-occlusion check that prompted this also confirmed the **shader** must keep drawing:
+**The shader must keep drawing while you scroll.** An occlusion check confirmed it:
 content sections are transparent and only `body` is opaque (behind the canvas), so
 the dimmed atmosphere and embers are genuinely visible through every section.
 Pausing the shader on scroll would flatten a visible background — don't.
@@ -743,7 +744,7 @@ the experiments.
 | Bricolage Grotesque | 128 KB | three variable axes, all genuinely used |
 | Instrument Serif | 30 KB | **two** files — roman *and* italic, both used |
 | Geist | 29 KB | body |
-| Geist Mono | 23 KB | labels, eyebrows, nav |
+| Geist Mono | 23 KB | labels, nav, handles |
 
 - **Narrowing a range inside an axis saves nothing.** `Geist:wght@200..600` and
   `wght@300..500` return byte-identical files (29288 B), as do Geist Mono
@@ -843,7 +844,7 @@ with the widest reach, since it appears in every Twitter / iMessage / Slack
 preview. A stale claim there outlives the page by a long way.
 
 Source: **`tools/og-card.html`** (marked `noindex`, regeneration steps in its
-header comment). Re-render at exactly 1200×630 whenever the hero eyebrow, lede
+header comment). Re-render at exactly 1200×630 whenever the lede
 or wordmark changes, then:
 
 ```sh
@@ -1012,9 +1013,9 @@ catches it immediately where a screenshot will not.
 axe-core injected over the Chrome DevTools Protocol) is not required and may not
 be installed — the DevTools route above covers the same ground.
 
-Known-and-accepted findings, whatever tool reports them: the marquee and hero
-mark register as "clipped" (both intentional, inside `overflow: clip`, and
-create no scroll), and the giant footer wordmark registers low contrast (it is
+Known-and-accepted findings, whatever tool reports them: the hero
+mark registers as "clipped" (intentional, inside `overflow: clip`, and creates
+no scroll), and the giant footer wordmark registers low contrast (it is
 `aria-hidden` and decorative — exempt under WCAG 1.4.3 as incidental text).
 
 Worth re-testing after significant changes, because each of these has caught a
