@@ -23,17 +23,19 @@ Everything started to make sense. The music, the voice, the writing — it was n
 
 ## Listen
 - Spotify: https://open.spotify.com/artist/2hOTXFAT3nfL4G1tikKT3I
-- Apple Music: https://music.apple.com/tr/artist/the-obsessn/1895867991
+- Apple Music: https://music.apple.com/artist/the-obsessn/1895867991
 - SoundCloud: https://soundcloud.com/theobsessn
 
 ## Social Media
-- Instagram: https://instagram.com/theobsessn (@theobsessn)
-- X / Twitter: https://twitter.com/theobsessn (@theobsessn)
-- TikTok: https://tiktok.com/@theobsessn (@theobsessn)
+- Instagram: https://www.instagram.com/theobsessn (@theobsessn)
+- X / Twitter: https://x.com/theobsessn (@theobsessn)
+- TikTok: https://www.tiktok.com/@theobsessn (@theobsessn)
 
 ## Website
 - Official: https://theobsessn.com
-- AI Assistant: Ivy — a cinematic voice assistant that greets visitors
+- Sections: #top (home), #story (about), #eras (sound), #music (listen), #connect (follow)
+- Skip the intro with https://theobsessn.com/?nointro=1 ; replay it with https://theobsessn.com/?ivy=1
+- AI Assistant: Ivy — a cinematic voice that greets visitors, with lyrics synced to real audio
 
 ## Key Facts
 - Active for nearly 20 years

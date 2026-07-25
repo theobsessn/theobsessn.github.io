@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#060607">
+<title>Lost the thread — The Obsessn</title>
+<meta name="description" content="That page doesn't exist. Head back to theobsessn.com.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/webp" href="/assets/logo-96.webp" sizes="any">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/bricolagegrotesque/v9/3y996as8bTXq_nANBjzKo3IeZx8z6up5L-iNGfyOPPs.woff2">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@48..96,75..90,600..800&amp;family=Geist+Mono:wght@300..500&amp;family=Geist:wght@200..600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  /* One screen, no scroll — everything here is layout-local. */
+  .lost {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: clamp(1rem, 2.5vh, 1.6rem);
+    padding: var(--gut);
+    max-width: var(--maxw);
+    margin: 0 auto;
+    overflow: hidden;  /* fallback: overflow:clip is Safari 16+ */
+    overflow: clip;   /* the mark bleeds off-canvas by design; never let it scroll */
+  }
+  .lost-code {
+    font-family: var(--font-display);
+    font-size: clamp(4.5rem, min(22vw, 34vh), 15rem);
+    font-weight: 800;
+    font-variation-settings: 'wdth' 78, 'opsz' 96;
+    line-height: 0.8;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .lost-code span { color: var(--crimson-bright); }
+  .lost-say {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--t-md);
+    color: var(--ink-dim);
+    max-width: 32ch;
+    line-height: 1.45;
+  }
+  .lost-cta { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.6rem; }
+  .lost-mark {
+    position: absolute;
+    top: 50%;
+    right: calc(-1 * clamp(2rem, 7vw, 8rem));
+    translate: 0 -50%;
+    width: clamp(260px, 40vw, 620px);
+    aspect-ratio: 1;
+    opacity: 0.42;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 0;
+    mask-image: radial-gradient(circle at 50% 50%, #000 42%, transparent 72%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 42%, transparent 72%);
+    animation: markSpin 64s linear infinite;
+  }
+  @media (max-width: 880px) { .lost-mark { opacity: 0.2; right: -28%; top: 30%; } }
+</style>
+<noscript><style>
+  /* The atmosphere on this page comes from the module below, so with no JS the canvas
+     stays empty and nothing adds .no-gl either — the page fell back to flat --bg.
+     Same one-line fix and same single-source token as index.html. */
+  body { background: var(--painted-sky); background-attachment: fixed; }
+</style></noscript>
+</head>
+<body>
+
+<canvas id="gl-canvas" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="lost">
+  <div class="lost-mark" aria-hidden="true">
+    <img src="/assets/logo-512.webp" alt="" width="512" height="512">
+  </div>
+
+  <p class="eyebrow">Error — 404</p>
+  <h1 class="lost-code">4<span>0</span>4</h1>
+  <p class="lost-say">You followed something that isn't here. That happens — keep following whatever feels real.</p>
+
+  <div class="lost-cta">
+    <a href="/" class="btn btn-solid">Back to the start</a>
+    <a href="/#music" class="btn btn-ghost">Go to the music</a>
+  </div>
+</main>
+
+<script type="module">
+  import { createAtmosphere } from '/js/gl.js';
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const gl = createAtmosphere(document.querySelector('#gl-canvas'), { reducedMotion: rm });
+  gl.setAudio(0.12); // a slow ember pulse, nothing louder
+</script>
+</body>
+</html>

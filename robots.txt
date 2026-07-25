@@ -1,28 +1,42 @@
+# robots.txt groups are NOT cumulative — a crawler obeys only its most specific
+# matching group. Every named agent therefore needs its own Disallow, or it
+# simply ignores the rules in the "*" group.
+
 User-agent: *
 Allow: /
-Sitemap: https://theobsessn.com/sitemap.xml
+Disallow: /tools/
 
-# LLM Agents
+# LLM agents — explicitly welcome on the content, kept off the build source.
 User-agent: GPTBot
 Allow: /
+Disallow: /tools/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /tools/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /tools/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /tools/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /tools/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /tools/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /tools/
 
 User-agent: Amazonbot
 Allow: /
+Disallow: /tools/
+
+Sitemap: https://theobsessn.com/sitemap.xml
