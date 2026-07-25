@@ -1,6 +1,9 @@
 /* ---------- 0. DISPLAY FALLBACK ----------
-   If Bricolage can't load (blocked CDN, offline, hostile network) the wordmark
-   swaps to a system face. Measured at 216px, "OBSESSN" is 663px in Bricolage
+   If Bricolage can't load (blocked CDN,
+offline,
+hostile network) the wordmark
+   swaps to a system face. Measured at 216px,
+"OBSESSN" is 663px in Bricolage
    wdth-78 but 1152px in Arial Black — enough to run straight over the hero
    mark. Impact is the closest widely-installed match (779px); size-adjust
    closes the rest. Browsers without size-adjust still get Impact's far better
@@ -110,7 +113,13 @@
 }
 
 /* ---------- 2. RESET / BASE ---------- */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*,
+
+
+*::before,
+
+
+*::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   -webkit-text-size-adjust: 100%;
@@ -125,7 +134,9 @@ html {
 }
 
 [hidden] { display: none !important; }
-section[id], header[id] { scroll-margin-top: clamp(4.5rem, 12vh, 7rem); }
+section[id],
+
+header[id] { scroll-margin-top: clamp(4.5rem, 12vh, 7rem); }
 
 /* No WebGL? Fall back to a static painted sky. */
 body.no-gl {
@@ -153,7 +164,11 @@ body {
 body.is-locked { overflow: hidden; height: 100vh; height: 100svh; }
 
 a { color: inherit; text-decoration: none; }
-img, svg, video { display: block; max-width: 100%; }
+img,
+
+svg,
+
+video { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 ::selection { background: var(--crimson); color: #fff; }
 
@@ -167,11 +182,23 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   outline-offset: 4px;
   border-radius: 4px;
 }
-/* #gate and #shell are tabindex="-1" landing spots, not controls — JS focuses them so
+/* #gate and #shell are tabindex="-1" landing spots,
+
+not controls — JS focuses them so
    a dialog opening/closing is announced (see main.js). They can never be reached by
-   Tab, so suppressing the ring costs no focus visibility, and leaving it on would draw
+   Tab,
+
+so suppressing the ring costs no focus visibility,
+
+and leaving it on would draw
    a 2px crimson outline around the ENTIRE gate overlay and the whole site shell. */
-#gate:focus, #gate:focus-visible, #shell:focus, #shell:focus-visible { outline: none; }
+#gate:focus,
+
+#gate:focus-visible,
+
+#shell:focus,
+
+#shell:focus-visible { outline: none; }
 
 /* ---------- 3. ATMOSPHERE LAYERS ---------- */
 #gl-canvas {
@@ -199,10 +226,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   animation: grainShift 0.7s steps(4) infinite;
 }
 @keyframes grainShift {
-  0%   { transform: translate(0, 0); }
-  25%  { transform: translate(-24px, 12px); }
-  50%  { transform: translate(18px, -20px); }
-  75%  { transform: translate(-12px, -8px); }
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-24px, 12px); }
+  50% { transform: translate(18px, -20px); }
+  75% { transform: translate(-12px, -8px); }
   100% { transform: translate(0, 0); }
 }
 
@@ -217,7 +244,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 /* ---------- 4. CUSTOM CURSOR ---------- */
-.cursor-dot, .cursor-ring {
+.cursor-dot,
+
+
+.cursor-ring {
   position: fixed;
   top: 0; left: 0;
   z-index: 9500;
@@ -241,7 +271,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
               margin 0.35s var(--ease-out), border-color 0.35s var(--ease-out),
               background-color 0.35s var(--ease-out), opacity 0.4s ease;
 }
-body.cursor-live .cursor-dot, body.cursor-live .cursor-ring { opacity: 1; }
+body.cursor-live .cursor-dot,
+
+body.cursor-live .cursor-ring { opacity: 1; }
 body.cursor-hover .cursor-ring {
   width: 76px; height: 76px; margin: -38px 0 0 -38px;
   border-color: rgba(255, 36, 66, 0.65);
@@ -251,7 +283,9 @@ body.cursor-hover .cursor-dot { opacity: 0; }
 body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14px; }
 
 @media (hover: none), (pointer: coarse) {
-  .cursor-dot, .cursor-ring { display: none !important; }
+  .cursor-dot,
+
+  .cursor-ring { display: none !important; }
 }
 
 /* ---------- 5. PRELOADER ---------- */
@@ -327,6 +361,7 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   filter: contrast(1.08) saturate(1.05);
 }
 .gate-orb::before,
+
 .gate-orb::after {
   content: '';
   position: absolute;
@@ -337,8 +372,8 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 }
 .gate-orb::after { animation-delay: 1.8s; }
 @keyframes orbRing {
-  0%   { transform: scale(0.86); opacity: 0; }
-  25%  { opacity: 0.9; }
+  0% { transform: scale(0.86); opacity: 0; }
+  25% { opacity: 0.9; }
   100% { transform: scale(1.32); opacity: 0; }
 }
 .gate-orb-glow {
@@ -350,8 +385,10 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   animation: orbBreath 5s var(--ease-io) infinite;
 }
 @keyframes orbBreath {
-  0%, 100% { opacity: 0.55; transform: scale(0.94); }
-  50%      { opacity: 1;    transform: scale(1.1); }
+  0%,
+
+  100% { opacity: 0.55; transform: scale(0.94); }
+  50% { opacity: 1;    transform: scale(1.1); }
 }
 
 .gate-word {
@@ -477,7 +514,8 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   box-shadow: 0 0 10px var(--crimson-bright);
   animation: pipPulse 1.4s var(--ease-io) infinite;
 }
-@keyframes pipPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+@keyframes pipPulse { 0%,
+ 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
 .ivy-name {
   font-family: var(--font-mono);
   font-size: var(--t-micro);
@@ -614,11 +652,17 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 }
 
 .js-failsafe .preloader,
+
+
 .js-failsafe .gate,
+
+
 .js-failsafe .ivy { display: none !important; }
 .js-failsafe .shell { opacity: 1 !important; }
 .js-failsafe [data-reveal],
+
 .js-failsafe .split-line > i,
+
 .js-failsafe .hero-title .ch { opacity: 1 !important; transform: none !important; }
 
 /* ---------- 8. SHELL ---------- */
@@ -751,10 +795,18 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   transition: background-color 0.4s var(--ease-out), color 0.4s, transform 0.4s var(--ease-out);
   white-space: nowrap;
 }
-/* --crimson, not --crimson-bright: this pill inverts on hover (near-white + dark ink
-   → filled + white ink), and #fff on #ff2442 is only 3.76:1 — under the 4.5:1 that
+/* --crimson,
+
+not --crimson-bright: this pill inverts on hover (near-white + dark ink
+   → filled + white ink),
+
+and #fff on #ff2442 is only 3.76:1 — under the 4.5:1 that
    13.1px uppercase mono needs. --crimson clears it at 5.88:1 and is already the
-   established "filled crimson, white ink" pairing here (::selection, and the
+   established "filled crimson,
+
+white ink" pairing here (::selection,
+
+and the
    .btn-solid hover gradient starting at #b4142a). */
 .nav-cta:hover { background: var(--crimson); color: #fff; transform: translateY(-1px); }
 
@@ -821,7 +873,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 .drawer.open a:nth-child(2) { transition-delay: 0.14s; }
 .drawer.open a:nth-child(3) { transition-delay: 0.2s; }
 .drawer.open a:nth-child(4) { transition-delay: 0.26s; }
-.drawer a:hover, .drawer a:focus-visible { color: var(--crimson-text); }
+.drawer a:hover,
+
+.drawer a:focus-visible { color: var(--crimson-text); }
 .drawer a.current { color: var(--ink); }
 .drawer a.current::after {
   content: '';
@@ -860,7 +914,10 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   z-index: 1;
 }
 
-/* The mark, oversized and half-buried — it fills the right of the fold
+/* The mark,
+
+
+oversized and half-buried — it fills the right of the fold
    without competing with the wordmark. */
 .hero-mark {
   position: absolute;
@@ -888,24 +945,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   .hero-mark { opacity: 0.22; width: min(74vw, 380px); top: 27%; right: -26%; }
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: clamp(1.2rem, 3vh, 2rem);
-}
-.eyebrow::before {
-  content: '';
-  width: clamp(28px, 6vw, 56px);
-  height: 1px;
-  background: linear-gradient(90deg, var(--crimson-bright), transparent);
-}
-
 .hero-title {
   font-family: var(--font-display);
   font-size: var(--t-mega);
@@ -916,7 +955,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   text-transform: uppercase;
   margin-bottom: clamp(1.6rem, 4vh, 2.6rem);
 }
-/* fit-content so a background-clip gradient spans the WORD, not the full
+/* fit-content so a background-clip gradient spans the WORD,
+
+not the full
    column — otherwise the ink stops of the ramp swallow the whole line. */
 .hero-title .ln { display: block; width: fit-content; overflow: hidden; padding-bottom: 0.04em; }
 .hero-title .ch {
@@ -928,7 +969,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 }
 .shell.live .hero-title .ch { transform: none; opacity: 1; }
 /* .tint is coloured per character in js/motion.js — see splitText().
-   Until (or unless) that runs, fall back to a gradient on the whole line. */
+   Until (or unless) that runs,
+
+fall back to a gradient on the whole line. */
 .hero-title .ln.tint:not(:has(.ch)) {
   background: linear-gradient(100deg, var(--ink) 0%, var(--ink) 62%, var(--crimson) 86%, #ff5a2d 100%);
   -webkit-background-clip: text;
@@ -957,28 +1000,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   flex-direction: column;
   gap: 1.6rem;
   align-items: flex-start;
-}
-.hero-stats {
-  display: flex;
-  gap: clamp(1.2rem, 3vw, 2.6rem);
-  flex-wrap: wrap;
-}
-.stat { display: flex; flex-direction: column; gap: 0.2rem; }
-.stat b {
-  font-family: var(--font-display);
-  font-size: var(--t-lg);
-  font-weight: 700;
-  font-variation-settings: 'wdth' 85;
-  line-height: 1;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-.stat span {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
 }
 
 .hero-cta { display: flex; gap: 0.8rem; flex-wrap: wrap; }
@@ -1017,7 +1038,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   box-shadow: 0 12px 34px -12px rgba(200, 16, 46, 0.8);
 }
 /* End stop matches --accent-grad-btn's #d43a22: at #e0402c the last 14% of the
-   sweep sat at 4.25:1 under the white label. Same fix as .gate-btn, smaller margin. */
+   sweep sat at 4.25:1 under the white label. Same fix as .gate-btn,
+
+smaller margin. */
 .btn-solid::before { background: linear-gradient(115deg, #b4142a, #d43a22); }
 .btn-solid:hover::before { transform: translateY(0); }
 .btn-solid:hover { box-shadow: 0 20px 46px -14px rgba(255, 106, 61, 0.7); }
@@ -1061,54 +1084,13 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   animation: railRun 2.2s var(--ease-io) infinite;
 }
 @keyframes railRun {
-  0%   { transform: translateY(-100%); }
+  0% { transform: translateY(-100%); }
   100% { transform: translateY(250%); }
 }
 
 @media (max-width: 880px) {
   .hero-grid { grid-template-columns: 1fr; gap: 2rem; align-items: start; }
   .hero-side { gap: 1.4rem; }
-}
-
-/* ---------- 11. MARQUEE ---------- */
-.marquee {
-  position: relative;
-  z-index: 1;
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.015);
-  padding: clamp(0.9rem, 2.2vw, 1.5rem) 0;
-  overflow: hidden;
-  display: flex;
-  white-space: nowrap;
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-.marquee-track {
-  display: flex;
-  align-items: center;
-  gap: clamp(1.6rem, 4vw, 3.4rem);
-  padding-right: clamp(1.6rem, 4vw, 3.4rem);
-  will-change: transform;
-  flex-shrink: 0;
-}
-.marquee-track span {
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2.6vw, 2rem);
-  font-weight: 600;
-  font-variation-settings: 'wdth' 80;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(244, 239, 233, 0.5);
-  transition: color 0.4s;
-}
-.marquee-track span:nth-of-type(even) { color: rgba(255, 95, 116, 0.85); }
-.marquee-track i {
-  display: block;
-  width: 6px; height: 6px;
-  rotate: 45deg;
-  background: var(--crimson);
-  flex-shrink: 0;
 }
 
 /* ---------- 12. SECTION PRIMITIVES ---------- */
@@ -1120,6 +1102,7 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 /* A hairline that fades out toward the edges — enough rhythm to separate
    sections without drawing a hard rule across the atmosphere. */
 .section + .section::before,
+
 .footer::before {
   content: '';
   position: absolute;
@@ -1142,13 +1125,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   padding-bottom: 1.4rem;
   border-bottom: 1px solid var(--hairline);
 }
-.sec-index {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.3em;
-  color: var(--crimson-text);
-  text-transform: uppercase;
-}
 .sec-title {
   font-family: var(--font-display);
   font-size: var(--t-xl);
@@ -1157,15 +1133,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   text-transform: uppercase;
   letter-spacing: -0.015em;
   line-height: 0.95;
-}
-.sec-note {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  max-width: 26ch;
-  line-height: 1.8;
 }
 
 /* ---------- 13. ABOUT ---------- */
@@ -1310,7 +1277,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 
 @media (max-width: 760px) {
   .sec-head { flex-direction: column; align-items: stretch; gap: 1.1rem; }
-  .sec-note { max-width: none; line-height: 1.7; }
 }
 
 @media (max-width: 900px) {
@@ -1320,69 +1286,7 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   .about-tags { max-width: none; }
 }
 
-/* ---------- 14. ERAS ---------- */
-.eras { display: grid; gap: 0; border-top: 1px solid var(--hairline); }
-.era {
-  display: grid;
-  grid-template-columns: 5rem minmax(0, 1fr) minmax(0, 1.1fr) 3rem;
-  gap: clamp(1rem, 3vw, 2.5rem);
-  align-items: center;
-  padding: clamp(1.4rem, 3.4vw, 2.2rem) 0;
-  border-bottom: 1px solid var(--hairline);
-  position: relative;
-  transition: color 0.5s var(--ease-out);
-}
-.era::before {
-  content: '';
-  position: absolute;
-  inset: 0 -1.5rem;
-  background: linear-gradient(90deg, rgba(255,36,66,0.07), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
-  pointer-events: none;
-  border-radius: var(--r-sm);
-}
-.era:hover::before { opacity: 1; }
-.era-no {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.2em;
-  color: var(--ink-faint);
-  transition: color 0.5s;
-}
-.era:hover .era-no { color: var(--crimson-text); }
-.era-name {
-  font-family: var(--font-display);
-  /* Was a one-off clamp(1.3rem, 3.4vw, 2.4rem). It shared --t-lg's 2.4rem cap so
-     the two matched on desktop, but its ramp was steeper and they crossed around
-     1024px — era names outranked the other h3s on desktop and fell below them on
-     mobile, where this bottomed out at 20.8px against their 24.7px. Same heading
-     level, same token. The pure-vw preferred value also ignored the user's font
-     size; --t-lg's rem term does not. */
-  font-size: var(--t-lg);
-  font-weight: 600;
-  font-variation-settings: 'wdth' 82;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  transition: transform 0.55s var(--ease-out), color 0.5s;
-}
-.era:hover .era-name { transform: translateX(10px); }
-.era-desc { font-size: var(--t-sm); color: var(--ink-faint); line-height: 1.65; }
-.era-arrow {
-  justify-self: end;
-  font-family: var(--font-mono);
-  color: var(--ink-trace);
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.45s, transform 0.45s var(--ease-out), color 0.45s;
-}
-.era:hover .era-arrow { opacity: 1; transform: none; color: var(--crimson-text); }
-
 @media (max-width: 760px) {
-  .era { grid-template-columns: 2.6rem minmax(0, 1fr); gap: 0.9rem 1rem; }
-  .era-desc { grid-column: 2; }
-  .era-arrow { display: none; }
 }
 
 /* ---------- 15. MUSIC ---------- */
@@ -1432,7 +1336,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   box-shadow: 0 30px 70px -32px color-mix(in srgb, var(--plat) 65%, transparent);
 }
 .plat:hover::before { opacity: 1; }
-/* The SoundCloud mark is wide and short — matched on visual weight, not on box. */
+/* The SoundCloud mark is wide and short — matched on visual weight,
+
+not on box. */
 .plat-icon-wide { width: 64px; height: 31px; }
 .plat-icon {
   width: 42px; height: 42px;
@@ -1440,10 +1346,15 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   margin-bottom: auto;
   transition: color 0.5s var(--ease-out), transform 0.6s var(--ease-out);
 }
-/* Grow from the left rail, not the centre: a centred scale(1.08) on a 42px icon
-   pushes its left edge 1.68px out past .plat-name / .plat-desc, breaking the one
+/* Grow from the left rail,
+
+breaking the one
    vertical line the card is built on — the kind of raggedness you see instantly
-   and cannot name. Same zoom, same lift, alignment intact. */
+   and cannot name. Same zoom,
+
+same lift,
+
+alignment intact. */
 .plat:hover .plat-icon { color: var(--plat); transform: scale(1.08) translateY(-3px); transform-origin: left center; }
 .plat-name {
   font-family: var(--font-display);
@@ -1453,7 +1364,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   line-height: 1;
   letter-spacing: -0.01em;
 }
-.plat-desc { font-size: var(--t-sm); color: var(--ink-faint); }
 .plat-go {
   position: absolute;
   top: clamp(1.4rem, 3vw, 2rem);
@@ -1463,7 +1373,7 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   border: 1px solid var(--hairline);
   display: grid;
   place-items: center;
-  font-size: 0.8rem;
+  font-size: var(--t-micro);
   color: var(--ink-faint);
   transition: transform 0.5s var(--ease-out), border-color 0.5s, color 0.5s, background-color 0.5s;
 }
@@ -1502,15 +1412,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--ink-faint);
-}
-.player-live { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--crimson-text) !important; }
-.player-live::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 10px currentColor;
-  animation: pipPulse 1.6s var(--ease-io) infinite;
 }
 .player-frame {
   position: relative;
@@ -1607,7 +1508,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   color: var(--ink-dim);
   transition: color 0.5s var(--ease-out), transform 0.6s var(--ease-out);
 }
-/* Left-rail origin, for the same reason as .plat-icon above. */
+/* Left-rail origin,
+
+for the same reason as .plat-icon above. */
 .social:hover .social-icon { color: var(--soc); transform: scale(1.08) translateY(-3px); transform-origin: left center; }
 
 .social-meta { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
@@ -1637,7 +1540,7 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   border: 1px solid var(--hairline);
   display: grid;
   place-items: center;
-  font-size: 0.8rem;
+  font-size: var(--t-micro);
   color: var(--ink-faint);
   transition: transform 0.5s var(--ease-out), border-color 0.5s, color 0.5s, background-color 0.5s;
 }
@@ -1650,13 +1553,22 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 
 /* ---------- 16b. STACKED CARDS ON A PHONE ----------
    The .plat / .social floors (240px / 180px) were chosen for a ~427px-wide card
-   sitting in a row of three, where the generous space under the icon reads as
+   sitting in a row of three,
+
+
+where the generous space under the icon reads as
    poster framing and costs the page its height only once. Below ~480px the grid
-   is one column and the card is only ~280px wide, so the same absolute floor
+   is one column and the card is only ~280px wide,
+
+
+so the same absolute floor
    turns it TALLER than it is wide — inverting the designed proportion — and
    multiplies ~90px of dead air by three in Music and by three again in Connect.
    These floors hold the desktop ratio (~0.72 and ~0.54) at phone width instead
-   of drifting, so the framing survives and the empty scroll goes away. */
+   of drifting,
+
+
+so the framing survives and the empty scroll goes away. */
 @media (max-width: 480px) {
   .plat { min-height: 156px; }
   .social { min-height: 138px; }
@@ -1672,24 +1584,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
     linear-gradient(180deg, rgba(6, 6, 7, 0) 0%, rgba(6, 6, 7, 0.72) 38%, rgba(6, 6, 7, 0.95) 100%),
     linear-gradient(180deg, transparent, rgba(200, 16, 46, 0.06));
   overflow: hidden;
-}
-.footer-cta {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-bottom: clamp(3rem, 8vw, 6rem);
-}
-.footer-cta h2 {
-  font-family: var(--font-display);
-  font-size: var(--t-xl);
-  font-weight: 700;
-  font-variation-settings: 'wdth' 80;
-  text-transform: uppercase;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  max-width: 14ch;
 }
 .footer-word {
   font-family: var(--font-display);
@@ -1737,8 +1631,6 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   transition: color 0.35s;
 }
 .footer-bar a:hover { color: var(--crimson-text); }
-.footer-bar .ivy-tag { color: var(--ink-faint); }
-.footer-bar .ivy-tag b { color: var(--crimson-text); font-weight: 500; }
 
 /* ---------- 18. REVEALS ---------- */
 [data-reveal] {
@@ -1763,7 +1655,9 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   transition: transform 1s var(--ease-out);
   transition-delay: var(--d, 0s);
 }
-.seen .split-line > i, .split-line.seen > i { transform: none; }
+.seen .split-line > i,
+
+.split-line.seen > i { transform: none; }
 
 /* ---------- 18b. SHORT VIEWPORTS (landscape phones) ---------- */
 @media (orientation: landscape) and (max-height: 540px) {
@@ -1817,7 +1711,13 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 
 /* ---------- 18b2. HIGH CONTRAST PREFERENCE ----------
    Distinct from forced-colors: the visitor wants more contrast but keeps the
-   design. Raise every muted ink step, firm up the hairlines, and pull the
+   design. Raise every muted ink step,
+
+
+firm up the hairlines,
+
+
+and pull the
    atmosphere back so text isn't competing with the smoke field. */
 @media (prefers-contrast: more) {
   :root {
@@ -1942,7 +1842,10 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
 }
 
 /* ---------- 18d. PRINT ----------
-   Browsers omit backgrounds when printing, so the dark theme would send
+   Browsers omit backgrounds when printing,
+
+
+so the dark theme would send
    near-white text to white paper — an effectively blank page. Flip to
    ink-on-paper and drop everything that only makes sense on screen. */
 @media print {
