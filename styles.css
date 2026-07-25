@@ -1667,7 +1667,6 @@ so the framing survives and the empty scroll goes away. */
   }
   /* Buy back enough vertical room that the CTA still lands above the fold. */
   .hero-title { font-size: clamp(2.1rem, 19vh, 4.5rem); margin-bottom: 1rem; }
-  .eyebrow { margin-bottom: 0.7rem; }
   .hero-lede { font-size: var(--t-sm); }
   .hero-side { gap: 0.9rem; }
   .hero-scroll { display: none; }
@@ -1737,8 +1736,6 @@ and pull the
   #gl-canvas,
   #gl-canvas.ready { opacity: 0.22; }
   .grain { opacity: 0.05; }
-  .marquee-track span { color: rgba(244, 239, 233, 0.8); }
-  .marquee-track span:nth-of-type(even) { color: #ff8a99; }
   /* 0.34 measured 2.74:1 — still under the 3:1 large-text bar, in the one mode where
      the visitor has explicitly asked for more contrast. 0.40 reads 3.40:1. Safe to
      brighten: the wordmark is `position: static` and occupies its own band between the
@@ -1838,7 +1835,7 @@ and pull the
   /* the filled button is a gradient, which forced-colors strips — without a
      border it stops looking like a control at all */
   .btn, .gate-btn, .nav-cta, .skip-link { border: 1px solid CanvasText; }
-  .marquee, .sec-head, .era, .eras { border-color: CanvasText; }
+  .sec-head { border-color: CanvasText; }
 }
 
 /* ---------- 18d. PRINT ----------
@@ -1866,7 +1863,7 @@ so the dark theme would send
 
   #gl-canvas, .grain, .vignette, .cursor-dot, .cursor-ring,
   .preloader, .gate, .ivy, .nav, .drawer, .scroll-progress,
-  .marquee, .hero-mark, .hero-scroll, .footer-word, .skip-link,
+  .hero-mark, .hero-scroll, .footer-word, .skip-link,
   .player, .plat-go, .social-go { display: none !important; }
 
   .shell { opacity: 1 !important; }
@@ -1882,7 +1879,7 @@ so the dark theme would send
   .about-portrait { max-width: 130px; margin-bottom: 1rem; }
   .about-sticky { position: static; }
 
-  .plat, .social, .era, .pullquote, .sec-head {
+  .plat, .social, .pullquote, .sec-head {
     break-inside: avoid;
     border: 1px solid #ccc;
   }
