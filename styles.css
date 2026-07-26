@@ -1177,25 +1177,6 @@ smaller margin. */
   mix-blend-mode: color;
   pointer-events: none;
 }
-.about-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; max-width: 340px; }
-.tag {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 0.4rem 0.8rem;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--hairline);
-  color: var(--ink-faint);
-  background: var(--surface-1);
-  transition: color 0.4s, border-color 0.4s, background-color 0.4s, transform 0.4s var(--ease-out);
-}
-.tag:hover {
-  color: var(--ink);
-  border-color: var(--hairline-warm);
-  background: rgba(255, 36, 66, 0.08);
-  transform: translateY(-2px);
-}
 
 .prose { max-width: var(--readw); }
 .prose > * + * { margin-top: 1.5rem; }
@@ -1283,8 +1264,7 @@ smaller margin. */
   .about-grid { grid-template-columns: 1fr; }
   .about-sticky { position: static; flex-direction: row; align-items: center; flex-wrap: wrap; }
   .about-portrait { max-width: 180px; }
-  .about-tags { max-width: none; }
-}
+  }
 
 @media (max-width: 760px) {
 }
@@ -1766,7 +1746,7 @@ and pull the
   .ivy-badge  { background: #0d0d10; }
   .drawer     { background: #08080a; }
   .plat, .social, .player { background: var(--bg-card); }
-  .tag, .btn-ghost { background: #121216; }
+  .btn-ghost { background: #121216; }
   .nav-pill { background: rgba(255, 255, 255, 0.14); }
 }
 

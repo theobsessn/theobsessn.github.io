@@ -121,7 +121,7 @@ export function cursor() {
   addEventListener('pointerup', () => document.body.classList.remove('cursor-down'));
   addEventListener('pointerleave', () => document.body.classList.remove('cursor-live'));
 
-  const HOVER = 'a, button, [data-tilt], .tag, input, iframe';
+  const HOVER = 'a, button, [data-tilt], input, iframe';
   addEventListener('pointerover', (e) => {
     if (e.target.closest?.(HOVER)) document.body.classList.add('cursor-hover');
   }, { passive: true });

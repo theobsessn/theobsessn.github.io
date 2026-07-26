@@ -34,15 +34,21 @@ ticker ("No Rules", "Raw Obsession"), an entire **Eras** section with five
 invented descriptions, numbered section labels (`01 — About`) and their notes,
 platform blurbs ("Stream all tracks"), a footer headline ("Stay kind. / Stay
 obsessed.") and its button, "Crafted with obsession · guided by Ivy", a "Now
-streaming" label, and an interview-style heading.
+streaming" label, an interview-style heading, and the genre chips
+("Heavy Metal / Blues / Dark Pop / Synthwave / Alternative") that sat beside the
+biography portrait.
 
 Two consequences worth knowing before you "fix" something:
 
-- **The spoken intro is off the visitor path.** Its script — "No genre. No rules.
-  Just raw obsession." — was written copy too. Everyone lands directly on the
-  site; the gate, `js/ivy.js` and `ivy-intro.mp3` are all still here and still
-  work, reachable only with `?ivy=1`, so the feature can return **if** it is given
-  the artist's own words. `straightIn` in `js/main.js` is the single switch.
+- **The spoken intro is ON the visitor path, by request.** It was briefly taken
+  off it — its script ("No genre. No rules. Just raw obsession.") is written copy
+  like the rest — but the artist asked for it back: *"Ivy nereye gitti :( böyle
+  esrarengiz ilgi çekici bir girişti o."* So the gate greets every new visitor
+  again. `straightIn` in `js/main.js` is the single switch, and it still skips for
+  `?nointro=1`, for a deep link, and for anyone who has already seen it this
+  session (`sessionStorage['obsessn:seen']`). **The spoken words are the one piece
+  of written copy the artist has chosen to keep** — change them in `CUES` in
+  `js/ivy.js` if they ever supply their own, and re-time every cue.
 - **The OG card is a generated image**, so removing copy from the HTML does not
   remove it from link previews. `assets/og.jpg` carried the eyebrow for a while
   after the site did not. Re-render it from `tools/og-card.html` whenever the
