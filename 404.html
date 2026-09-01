@@ -99,8 +99,7 @@
 <script type="module">
   import { createAtmosphere } from '/js/gl.js';
   const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const gl = createAtmosphere(document.querySelector('#gl-canvas'), { reducedMotion: rm });
-  gl.setAudio(0.12); // a slow ember pulse, nothing louder
+  createAtmosphere(document.querySelector('#gl-canvas'), { reducedMotion: rm });
 </script>
 </body>
 </html>

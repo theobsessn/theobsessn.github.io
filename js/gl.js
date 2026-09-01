@@ -1,7 +1,7 @@
 /* ============================================================
    Atmosphere — hand-written WebGL2. No libraries.
    A domain-warped smoke field + additive embers, reactive to
-   pointer, scroll and (during the Ivy intro) live audio.
+   pointer and scroll.
    ============================================================ */
 
 const VERT_QUAD = `#version 300 es
@@ -17,8 +17,6 @@ uniform vec2  uRes;
 uniform float uTime;
 uniform vec2  uMouse;   // -1..1
 uniform float uScroll;  // 0..1 page progress
-uniform float uAudio;   // 0..1 live level
-uniform float uIvy;     // 0 ambient  →  1 orb
 uniform float uOct;     // fbm octaves budget
 
 float hash(vec2 p){
@@ -53,8 +51,7 @@ void main(){
   vec2 uv = gl_FragCoord.xy / uRes;
   vec2 p  = (gl_FragCoord.xy * 2.0 - uRes) / min(uRes.x, uRes.y);
 
-  float t   = uTime * 0.045;
-  float aud = uAudio;
+  float t = uTime * 0.045;
 
   // pointer parallax + gentle rise
   vec2 q = p + uMouse * 0.22;
@@ -65,24 +62,18 @@ void main(){
     fbm(q * 1.15 + vec2(0.0, t)),
     fbm(q * 1.15 + vec2(4.7, 2.1) - t * 0.8)
   );
-  float n = fbm(q * 1.45 + w * (1.55 + aud * 0.55));
+  float n = fbm(q * 1.45 + w * 1.55);
 
   float r = length(p * vec2(1.0, 1.12));
 
-  // ambient: dark centre, energy pushed to the frame — and weighted low,
-  // so the nav and the wordmark always sit on something close to black.
+  // dark centre, energy pushed to the frame — and weighted low, so the nav
+  // and the wordmark always sit on something close to black.
   float amb = smoothstep(0.30, 1.55, r) * 0.74 + 0.04;
   amb *= mix(1.2, 0.38, uv.y);
   // The atmosphere is a hero moment. Once you're reading, it steps back.
   amb *= mix(1.0, 0.5, smoothstep(0.02, 0.20, uScroll));
-  // ivy: a breathing orb, hollowed out — the lyric has to land on black,
-  // so the energy lives in the annulus, not the core.
-  float orbR = 0.62 + aud * 0.16;
-  float orb  = smoothstep(orbR + 0.45, orbR - 0.45, r) * (1.25 + aud * 1.5);
-  orb *= smoothstep(0.05, 0.66, r);
 
-  float mask = mix(amb, orb, uIvy);
-  float e = pow(max(n, 0.0), 1.45) * mask * (0.85 + aud * 0.75) * mix(1.0, 1.5, uIvy);
+  float e = pow(max(n, 0.0), 1.45) * amb * 0.85;
 
   const vec3 cInk    = vec3(0.022, 0.021, 0.026);
   const vec3 cBlood  = vec3(0.42, 0.032, 0.086);
@@ -91,15 +82,11 @@ void main(){
   vec3 col = mix(cInk, cBlood, smoothstep(0.03, 0.42, e));
   col = mix(col, cEmber, smoothstep(0.40, 0.95, e));
 
-  // ivy rim
-  float rim = smoothstep(0.05, 0.0, abs(r - orbR)) * uIvy;
-  col += vec3(0.95, 0.09, 0.16) * rim * (0.26 + aud * 0.7);
-
   // faint horizon glow anchored to the bottom of the viewport
-  col += vec3(0.30, 0.02, 0.06) * pow(1.0 - uv.y, 6.5) * (1.0 - uIvy) * 0.22;
+  col += vec3(0.30, 0.02, 0.06) * pow(1.0 - uv.y, 6.5) * 0.22;
 
-  // The site has to stay readable on top of this. Ivy gets the full burn.
-  col *= mix(0.60, 1.0, uIvy);
+  // The site has to stay readable on top of this.
+  col *= 0.60;
 
   // dither — kills banding on deep gradients
   col += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.012;
@@ -111,7 +98,6 @@ const VERT_EMBER = `#version 300 es
 precision highp float;
 in float aSeed;
 uniform float uTime;
-uniform float uAudio;
 uniform float uPx;
 uniform float uScroll;
 out float vA;
@@ -128,12 +114,12 @@ void main(){
   x += cos(uTime * 0.11 + s * 2.7) * 0.02;
 
   gl_Position = vec4(x * 2.0 - 1.0, y * 2.0 - 1.0, 0.0, 1.0);
-  gl_PointSize = (1.1 + h(s * 5.31) * 2.4) * (1.0 + uAudio * 1.6) * uPx;
+  gl_PointSize = (1.1 + h(s * 5.31) * 2.4) * uPx;
 
   vA = (0.12 + h(s * 7.77) * 0.42)
      * smoothstep(0.0, 0.12, y)
      * smoothstep(1.0, 0.78, y)
-     * (0.6 + uAudio * 0.8);
+     * 0.6;
 }`;
 
 const FRAG_EMBER = `#version 300 es
@@ -192,7 +178,7 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
 
   if (!gl) {
     document.body.classList.add('no-gl');
-    return { setIvy() {}, setAudio() {}, destroy() {}, ok: false };
+    return { destroy() {}, ok: false };
   }
 
   // ── embers ────────────────────────────────────────────────
@@ -211,8 +197,8 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
     ember = program(gl, VERT_EMBER, FRAG_EMBER);
     if (!smoke || !ember) return false;
 
-    uS = uni(gl, smoke, ['uRes', 'uTime', 'uMouse', 'uScroll', 'uAudio', 'uIvy', 'uOct']);
-    uE = uni(gl, ember, ['uTime', 'uAudio', 'uPx', 'uScroll']);
+    uS = uni(gl, smoke, ['uRes', 'uTime', 'uMouse', 'uScroll', 'uOct']);
+    uE = uni(gl, ember, ['uTime', 'uPx', 'uScroll']);
 
     vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -230,7 +216,7 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
 
   if (!buildResources()) {
     document.body.classList.add('no-gl');
-    return { setIvy() {}, setAudio() {}, destroy() {}, ok: false };
+    return { destroy() {}, ok: false };
   }
 
   // ── state ─────────────────────────────────────────────────
@@ -241,8 +227,6 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
     mx: 0, my: 0,          // eased pointer
     tmx: 0, tmy: 0,        // target pointer
     scroll: 0,
-    ivy: 0, ivyT: 0,
-    audio: 0, audioT: 0,
     running: true,
     lost: false,
     raf: 0,
@@ -291,8 +275,6 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
     gl.uniform1f(uS.uTime, t);
     gl.uniform2f(uS.uMouse, state.mx, state.my);
     gl.uniform1f(uS.uScroll, state.scroll);
-    gl.uniform1f(uS.uAudio, state.audio);
-    gl.uniform1f(uS.uIvy, state.ivy);
     gl.uniform1f(uS.uOct, OCT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -301,7 +283,6 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
     gl.useProgram(ember);
     gl.bindVertexArray(vao);
     gl.uniform1f(uE.uTime, t);
-    gl.uniform1f(uE.uAudio, state.audio);
     gl.uniform1f(uE.uPx, state.px * 2.2);
     gl.uniform1f(uE.uScroll, state.scroll);
     gl.drawArrays(gl.POINTS, 0, EMBERS);
@@ -314,7 +295,7 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
   // and heat on a phone. The 13.5ms gate is chosen NOT to disturb 60Hz: a 16.7ms
   // frame always clears it, so 60Hz stays 60fps untouched; only 8.3ms (120Hz)
   // frames get halved. The easing coefficients were tuned at 60fps, so pinning
-  // the cadence here also keeps parallax/audio easing consistent across refresh
+  // the cadence here also keeps the pointer parallax consistent across refresh
   // rates instead of running faster on 120Hz panels.
   let lastPaint = 0;
   const MIN_FRAME = 13.5;
@@ -327,8 +308,6 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
     // easing
     state.mx += (state.tmx - state.mx) * 0.045;
     state.my += (state.tmy - state.my) * 0.045;
-    state.ivy += (state.ivyT - state.ivy) * 0.06;
-    state.audio += (state.audioT - state.audio) * 0.18;
 
     paint((now - state.t0) / 1000);
 
@@ -336,11 +315,9 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
   }
 
   // Reduced motion still deserves the composition — just not the animation.
-  // Snap to the target and repaint exactly once.
+  // Repaint exactly once.
   function repaintStatic() {
     if (!reducedMotion) return;
-    state.ivy = state.ivyT;
-    state.audio = state.audioT;
     paint(12.0); // a fixed, pleasant point in the noise field
   }
 
@@ -371,8 +348,6 @@ export function createAtmosphere(canvas, { reducedMotion = false } = {}) {
 
   return {
     ok: true,
-    setIvy: (v) => { state.ivyT = v; repaintStatic(); },
-    setAudio: (v) => { state.audioT = Math.min(1, Math.max(0, v)); },
     destroy() {
       cancelAnimationFrame(state.raf);
       state.running = false;

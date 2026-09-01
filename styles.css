@@ -457,212 +457,12 @@ body.cursor-down .cursor-ring { width: 28px; height: 28px; margin: -14px 0 0 -14
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
 }
-.gate-skip {
-  display: block;
-  /* The label alone is 19px tall — under the 24px WCAG 2.5.8 floor, on the one
-     control that escapes the intro. The padding buys a ~33px target and the margin
-     drops by exactly the padding, so the label itself does not move a pixel.
-     Keep these two numbers in sync (and with the landscape override below). */
-  padding: 0.45rem 1rem;
-  /* margin-top loses the padding so the label holds its place; margin-bottom pulls
-     the lower padding back out of the flow, because the gate stack is vertically
-     CENTRED — without it the taller box grows the stack and drags the label up. */
-  margin: 1.15rem auto -0.45rem; /* 1.6rem - 0.45rem */
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  transition: color 0.35s;
-}
-.gate-skip:hover { color: var(--ink-dim); }
-
-/* ---------- 7. IVY INTRO ---------- */
-.ivy {
-  position: fixed;
-  inset: 0;
-  z-index: 9800;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: var(--gut);
-  transition: opacity 1s var(--ease-out), visibility 1s, filter 1s var(--ease-out);
-}
-.ivy.done { opacity: 0; visibility: hidden; pointer-events: none; filter: blur(20px); }
-
-.ivy-badge {
-  position: absolute;
-  top: clamp(1.5rem, 5vh, 3.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem 1.1rem;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-pill);
-  background: rgba(10, 10, 12, 0.5);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.ivy-pip {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--crimson-bright);
-  box-shadow: 0 0 10px var(--crimson-bright);
-  animation: pipPulse 1.4s var(--ease-io) infinite;
-}
-@keyframes pipPulse { 0%,
- 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
-.ivy-name {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--crimson-text);
-}
-.ivy-state {
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.ivy-stage {
-  position: relative;
-  z-index: 2;
-  width: min(880px, 92vw);
-  min-height: 46vh;
-  min-height: 46svh;
-  display: grid;
-  place-items: center;
-  text-align: center;
-}
-.ivy-line {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 5.6vw, 4rem);
-  font-weight: 400;
-  line-height: 1.28;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-  pointer-events: none;
-}
-.ivy-words {
-  /* Deliberately not flex: a flex container discards the whitespace between
-     words, which leaves the accessible text run together. Real spaces it is. */
-  display: block;
-  text-align: center;
-  max-width: 100%;
-  word-spacing: 0.06em;
-}
-.ivy-line .w {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.5em) rotateX(-55deg);
-  filter: blur(6px);
-  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out), filter 0.7s var(--ease-out);
-}
-.ivy-line.in .w { opacity: 1; transform: none; filter: none; }
-.ivy-line.out .w {
-  opacity: 0;
-  transform: translateY(-0.35em);
-  filter: blur(8px);
-  transition-duration: 0.5s;
-}
-.ivy-line.accent {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-variation-settings: 'wdth' 82, 'opsz' 96;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  line-height: 0.95;
-  font-size: clamp(2rem, 8.5vw, 6rem);
-}
-.ivy-line.accent .ivy-words {
-  background: linear-gradient(112deg, #fff 0%, #ffd9cf 28%, var(--crimson-bright) 68%, var(--ember) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.ivy-meter {
-  position: absolute;
-  bottom: clamp(5.5rem, 14vh, 9rem);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  height: 56px;
-  z-index: 2;
-}
-.ivy-meter i {
-  display: block;
-  width: 2px;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--ember), var(--crimson));
-  transform-origin: center;
-  will-change: height;
-}
-
-.ivy-skip {
-  position: absolute;
-  /* Same 24px-target fix as .gate-skip. This one is bottom-anchored, so the padding
-     grows the box UPWARD and the label would rise by padding-bottom — subtracting
-     that from `bottom` puts the label back exactly where it was. */
-  padding: 0.45rem 1rem;
-  bottom: calc(clamp(2rem, 6vh, 3.6rem) - 0.45rem);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  opacity: 0;
-  animation: fadeIn 1s var(--ease-out) 2.4s forwards;
-  transition: color 0.35s;
-  z-index: 3;
-}
-.ivy-skip:hover { color: var(--ink-dim); }
-@keyframes fadeIn { to { opacity: 1; } }
-
-.ivy-progress {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 1px;
-  background: var(--ink-trace);
-  z-index: 3;
-}
-.ivy-progress span {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: var(--accent-grad);
-  box-shadow: 0 0 12px rgba(255,36,66,0.8);
-}
 
 .js-failsafe .preloader,
-
-
-.js-failsafe .gate,
-
-
-.js-failsafe .ivy { display: none !important; }
+.js-failsafe .gate { display: none !important; }
 .js-failsafe .shell { opacity: 1 !important; }
 .js-failsafe [data-reveal],
-
 .js-failsafe .split-line > i,
-
 .js-failsafe .hero-title .ch { opacity: 1 !important; transform: none !important; }
 
 /* ---------- 8. SHELL ---------- */
@@ -1653,25 +1453,15 @@ so the framing survives and the empty scroll goes away. */
   .hero-mark { opacity: 0.16; width: min(52vh, 340px); top: 50%; right: -6%; }
   .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
 
-  /* The meter used to land inside the orb, right where the lyric renders. */
-  .ivy-stage { min-height: 30svh; }
-  .ivy-line { font-size: clamp(1.15rem, 4.6vh, 2.1rem); }
-  .ivy-line.accent { font-size: clamp(1.5rem, 6.4vh, 3rem); }
-  .ivy-meter { bottom: 2.6rem; height: 30px; }
-  .ivy-meter i { width: 2px; }
-  .ivy-skip { bottom: calc(0.75rem - 0.45rem); } /* less the tap-target padding */
-  .ivy-badge { top: 0.75rem; padding: 0.4rem 0.9rem; }
-
   /* Gate: the portrait stack (168px orb + 2.6rem / 3rem margins) overran a short
-     landscape viewport, leaving "Enter" mostly below the fold and "Skip intro"
-     entirely off-screen — a first-time landscape visitor could not reach the CTA
-     that starts the site at all. Size the orb off the short axis and shrink the
-     stack margins so orb + wordmark + sub + both buttons clear the fold. */
+     landscape viewport, leaving "Enter" mostly below the fold — a first-time
+     landscape visitor could not reach the CTA that starts the site at all. Size
+     the orb off the short axis and shrink the stack margins so orb + wordmark +
+     sub + button clear the fold. */
   .gate-orb { width: clamp(60px, 19vh, 116px); margin-bottom: clamp(0.7rem, 2.5vh, 1.6rem); }
   .gate-word { font-size: clamp(1.5rem, 6vh, 2.6rem); margin-bottom: 0.4rem; }
   .gate-sub { margin-bottom: clamp(0.9rem, 3.5vh, 2rem); }
   .gate-btn { padding: 0.8rem 2rem; }
-  .gate-skip { margin-top: calc(clamp(0.7rem, 2.5vh, 1.4rem) - 0.45rem); }
 
   /* The drawer menu was sized in vw only (up to 3.6rem/item), so five items ran
      ~496px tall and, centered in a ~390px landscape viewport, clipped "Home"
@@ -1733,7 +1523,7 @@ and pull the
    Frosted glass is the first thing to go when someone asks for less
    transparency; swap the blurred panels for solid surfaces. */
 @media (prefers-reduced-transparency: reduce) {
-  .nav, .drawer, .ivy-badge {
+  .nav, .drawer {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
@@ -1743,7 +1533,6 @@ and pull the
      the moment the visitor scrolled. */
   .nav,
   .nav.stuck  { background: #0d0d10; }
-  .ivy-badge  { background: #0d0d10; }
   .drawer     { background: #08080a; }
   .plat, .social, .player { background: var(--bg-card); }
   .btn-ghost { background: #121216; }
@@ -1769,7 +1558,7 @@ and pull the
      behind it. forced-colors forces the *colour* but keeps the alpha and the
      filter, so both have to go by hand. `.nav.stuck` is named for the same
      specificity reason as in the reduced-transparency block above. */
-  .nav, .nav.stuck, .drawer, .ivy-badge {
+  .nav, .nav.stuck, .drawer {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: Canvas;
@@ -1842,7 +1631,7 @@ so the dark theme would send
   html, body { background: #fff !important; color: #111 !important; }
 
   #gl-canvas, .grain, .vignette, .cursor-dot, .cursor-ring,
-  .preloader, .gate, .ivy, .nav, .drawer, .scroll-progress,
+  .preloader, .gate, .nav, .drawer, .scroll-progress,
   .hero-mark, .hero-scroll, .footer-word, .skip-link,
   .player, .plat-go, .social-go { display: none !important; }
 
@@ -1904,10 +1693,9 @@ so the dark theme would send
     word-break: break-all;
   }
 
-  /* Dead ink on paper: a JS-only replay control, a "Back to top" jump, and a ghost
-     button that scrolls to a section printed a few centimetres below it. Same reasoning
-     that already hides .skip-link, .plat-go and .social-go — none of it is content. */
-  .footer-replay,
+  /* Dead ink on paper: a "Back to top" jump, and a ghost button that scrolls to a
+     section printed a few centimetres below it. Same reasoning that already hides
+     .skip-link, .plat-go and .social-go — none of it is content. */
   .footer-bar a[href^="#"],
   a.btn[href^="#"] { display: none !important; }
 }
@@ -1924,5 +1712,4 @@ so the dark theme would send
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .split-line > i { transform: none !important; }
   .hero-title .ch { transform: none !important; opacity: 1 !important; }
-  .ivy-line .w { opacity: 1; transform: none; filter: none; }
 }

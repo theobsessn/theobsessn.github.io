@@ -7,18 +7,16 @@ package manager. Push to `main` and GitHub Pages serves it.
 index.html      markup + head (meta, JSON-LD, font + module preloads)
 404.html        branded not-found page, reuses the design system
 styles.css      design tokens + all styling, incl. every @media preference block
-js/main.js      entry: preloader → gate → Ivy → site handoff
+js/main.js      entry: preloader → gate → site handoff
 js/gl.js        WebGL2 atmosphere (hand-written GLSL, no library)
-js/ivy.js       the spoken intro: audio, FFT, lyric cues
 js/motion.js    reveals, cursor, nav, tilt, parallax
-ivy-intro.mp3   Ivy's voice track (51.76s)
 assets/         logo derivatives, generated OG card, favicons
 ```
 
 Local preview: `python3 -m http.server 4321`
 
-Useful URLs: `?nointro=1` skips the intro · `?ivy=1` replays it · a deep link
-like `#music` skips it automatically.
+Useful URLs: `?nointro=1` skips the gate · a deep link like `#music` skips it
+automatically.
 
 ---
 
@@ -40,15 +38,23 @@ biography portrait.
 
 Two consequences worth knowing before you "fix" something:
 
-- **The spoken intro is ON the visitor path, by request.** It was briefly taken
-  off it — its script ("No genre. No rules. Just raw obsession.") is written copy
-  like the rest — but the artist asked for it back: *"Ivy nereye gitti :( böyle
-  esrarengiz ilgi çekici bir girişti o."* So the gate greets every new visitor
-  again. `straightIn` in `js/main.js` is the single switch, and it still skips for
-  `?nointro=1`, for a deep link, and for anyone who has already seen it this
-  session (`sessionStorage['obsessn:seen']`). **The spoken words are the one piece
-  of written copy the artist has chosen to keep** — change them in `CUES` in
-  `js/ivy.js` if they ever supply their own, and re-time every cue.
+- **The spoken intro ("Ivy") is gone, and stays gone.** A 52-second narrated
+  overlay used to sit between the gate and the site: a voice track
+  (`ivy-intro.mp3`), an FFT that drove the shader, and a captioned lyric stage.
+  Its script ("No genre. No rules. Just raw obsession.") was written copy like
+  everything else above. It was removed once, the artist asked for it back
+  (*"Ivy nereye gitti :( böyle esrarengiz ilgi çekici bir girişti o."*), and on
+  **2026-09-01** they asked for it out again — this time completely. The audio,
+  `js/ivy.js`, the overlay markup, its CSS section, the shader's orb mode and
+  audio uniforms, and the footer replay link are all deleted. Do not resurrect
+  any of it from git history without being asked for it by name.
+- **The gate stays** — the logo orb, the wordmark and one *Enter* button. It is
+  now an entrance and nothing else, so it carries no "sound on" promise and no
+  second button; the old *Skip intro* went with the intro it skipped, because
+  two controls doing the same thing is not a choice. `straightIn` in
+  `js/main.js` is the single switch, and it still skips for `?nointro=1`, for a
+  deep link, and for anyone who has already walked through it this session
+  (`sessionStorage['obsessn:seen']`).
 - **The OG card is a generated image**, so removing copy from the HTML does not
   remove it from link previews. `assets/og.jpg` carried the eyebrow for a while
   after the site did not. Re-render it from `tools/og-card.html` whenever the
@@ -87,11 +93,6 @@ The Apple Music link is the one deliberate exception: its single redirect *is*
 the storefront adapting to the visitor.
 
 **Add a social link** — copy a `.social` card; `--soc` works like `--plat`.
-
-**Change Ivy's words or timings** — `CUES` in `js/ivy.js`. `t` is seconds into
-`ivy-intro.mp3`; `text: null` clears the screen. Replacing the audio means
-re-timing every cue. The full script, with stage directions, is transcribed
-in the comment above `CUES`.
 
 **Change the accent colour** — `--crimson`, `--crimson-bright`, `--ember` in
 `styles.css`. `--crimson-text` is the small-text variant and is deliberately
@@ -225,7 +226,7 @@ Two things worth not re-deriving:
   nothing here, so it was checked against `git ls-files`.
 - **Deep links and the legacy hash remap work.** `#music` → 3652px, `#connect` → 4856px,
   and the legacy `#about` → rewritten to `#story` (805px), `#hero` → `#top` (0px), all with
-  the intro skipped. Sections land 96px down, which is `scroll-margin-top` clearing the
+  the gate skipped. Sections land 96px down, which is `scroll-margin-top` clearing the
   fixed nav. **Test these with a cache-busting query** (`?t=2#about`): a hash-only change in
   the same tab is a *same-document* navigation, so `main.js` never re-runs and every hash
   appears to inherit the previous scroll position.
@@ -376,14 +377,12 @@ about 4.2 A4 sheets) found three things:
   `a[href^="http"]::after`, which covers the CTAs, the cards and the prose in one rule and
   gives any future link its destination for free. Everything else external
   (`.nav-cta`, `.player-fallback`) already sits inside a `display: none` ancestor.
-- **Three controls printed as dead ink** and are now hidden, for the same reason
-  `.skip-link` / `.plat-go` / `.social-go` already are — none of it is content: the
-  JS-only `#replay-intro`, "Back to top ↑", and the `href="#story"` ghost button, which
-  invited the reader to jump to a section printed a few centimetres below it.
-- **`.footer-replay`** (in `index.html`) wraps the `" · "` separator *together with* the
-  replay link, because hiding the link alone left "…guided by Ivy · " trailing into
-  nothing. It is an unstyled inline span — on screen the text, the single-line height and
-  the hit target are all unchanged; verified with `elementFromPoint`.
+- **Controls printed as dead ink** and are now hidden, for the same reason
+  `.skip-link` / `.plat-go` / `.social-go` already are — none of it is content:
+  "Back to top ↑", and the `href="#story"` ghost button, which invited the reader to
+  jump to a section printed a few centimetres below it. When you hide an inline link
+  that sits in a run of text, hide its separator with it — a `" · "` left behind trails
+  into nothing. That is what the old `.footer-replay` span existed for.
 
 **forced-colors: every icon needed forcing by hand, and the play glyph needed opting out**
 The `@media (forced-colors: active)` block had been written but never *rendered*. Doing so
@@ -409,10 +408,9 @@ have to look at:
   silently leaves the edge cream. The other `border-color: transparent` declarations here
   are all hover states, where forced-colors making them visible is desirable.
 
-**Focus is handed along the whole journey: gate → intro → shell**
-There are three modal surfaces and each must own the keyboard while it is up. The intro
-(`#ivy-skip`) and the drawer (first link, returned to the burger) always did. Two gaps
-were fixed:
+**Focus is handed along the whole journey: gate → shell**
+Every modal surface must own the keyboard while it is up. The drawer (first link,
+returned to the burger) always did. Two gaps were fixed:
 
 - **The gate never took focus.** It is `role="dialog" aria-modal="true"`, yet it opened
   with focus on `<body>`, so a screen reader was never told a dialog had appeared.
@@ -423,9 +421,9 @@ were fixed:
   pointer visitor. Landing on the container announces the `aria-label` instead, and Tab
   still reaches Enter next.
 - **The journey ended with focus stranded on `<body>`.** Whatever held the keyboard
-  (`#ivy-skip` or `#gate-skip`) was hidden with its dialog, so the browser reset focus
-  to the document start. `revealSite()` now focuses `#shell` (also `tabindex="-1"`), so
-  the next Tab still reaches the skip link exactly as before, but the position is ours.
+  was hidden with its dialog, so the browser reset focus to the document start.
+  `revealSite()` now focuses `#shell` (also `tabindex="-1"`), so the next Tab still
+  reaches the skip link exactly as before, but the position is ours.
 
 `#gate` and `#shell` are landing spots, not controls — they cannot be reached by Tab, so
 `styles.css` suppresses their focus ring. Without that, the global `:focus-visible` rule
@@ -442,26 +440,26 @@ displayed, so it yanked focus to the burger on page load. The branch is now guar
 `drawer.contains(document.activeElement)`, matching its stated purpose — un-stranding
 focus from a link inside a drawer the breakpoint just hid.
 
-**Both skip controls are padded to a 34px tap target, with compensating anchors**
-`#gate-skip` was 101×19 and `.ivy-skip` 120×19 — bare text buttons with no padding,
-under the 24px WCAG 2.5.8 floor, and between them they are the *only* way past the
-intro. Each now carries `padding: 0.45rem 1rem`, and each subtracts that padding back
-out of whatever anchors it, so the label does not move by even a pixel:
+**A bare text button is under the tap-target floor — pad it, then pay the padding back**
+The gate and the intro each carried a *Skip* control at 101×19 and 120×19 — bare text,
+no padding, under the 24px WCAG 2.5.8 floor, and between them the only way past the
+intro. Both are gone now with the intro itself, but the technique is worth keeping,
+because the next bare text button will have the same problem: give it
+`padding: 0.45rem 1rem` for a ~34px target, then **subtract that padding back out of
+whatever anchors it**, so the label does not move by even a pixel.
 
-- `.gate-skip` — `margin: 1.15rem auto -0.45rem` (was `1.6rem auto 0`). The top margin
-  loses the padding; the **negative bottom margin** is the part that is easy to miss —
-  the gate stack is vertically *centred*, so without it the taller box grows the stack
-  and drags the label up ~3.6px.
-- `.ivy-skip` — `bottom: calc(clamp(2rem, 6vh, 3.6rem) - 0.45rem)`. Bottom-anchored, so
-  the padding grows the box upward and the label would rise by `padding-bottom`.
-- The landscape block overrides both anchors, so it subtracts the padding too
-  (`calc(clamp(0.7rem, 2.5vh, 1.4rem) - 0.45rem)` and `calc(0.75rem - 0.45rem)`).
-  Landscape is the tight case: `.ivy-skip` sits 5.2px off the bottom edge at 844×390.
+- Top-anchored in a flow — `margin: 1.15rem auto -0.45rem` (from `1.6rem auto 0`). The
+  top margin loses the padding; the **negative bottom margin** is the part that is easy
+  to miss — the gate stack is vertically *centred*, so without it the taller box grows
+  the stack and drags the label up ~3.6px.
+- Bottom-anchored absolutely — `bottom: calc(clamp(2rem, 6vh, 3.6rem) - 0.45rem)`. The
+  padding grows the box upward, so the label would rise by `padding-bottom`.
+- The landscape block overrides those anchors, so it has to subtract the padding too.
+  Landscape is the tight case: 5.2px off the bottom edge at 844×390.
 
-Verified: 133×34 / 152×34 portrait and 137×34 / 156×34 landscape, label ink at exactly
-its old coordinates (587.9 / 775.1 portrait, 291.3 / 359.0 landscape), everything still
-in the fold, and a synthetic tap 4.9px *above* the old label box now hits the button and
-reveals the site. Keep the padding and the anchor `calc()`s in sync if you touch either.
+Verified at the time: 133×34 / 152×34 portrait and 137×34 / 156×34 landscape, label ink
+at exactly its old coordinates, everything still in the fold, and a synthetic tap 4.9px
+*above* the old label box hitting the button.
 
 **Hover states that fill with an accent get the *darkened* accent, never the display one**
 Three places inverted on hover to a bright fill under a light label and lost AA doing it.
@@ -517,21 +515,21 @@ inherits), killing the grey box mobile browsers flash on every tap. Safe because
 every interactive element already has a `:hover` state, which fires on touch — so
 taps keep feedback, just the site's own instead of the browser's default.
 
-**The Ivy meter is static under `prefers-reduced-motion`**
-It's painted from JS every frame, so the CSS reduced-motion block never touched
-it — 56 bars oscillating for 52 seconds at someone who asked for no motion.
-`gl.js` also snaps and repaints once so those users still get the orb.
+**Anything painted from JS every frame escapes the CSS reduced-motion block**
+The block cannot reach a value written by `requestAnimationFrame` — the intro's
+56-bar meter oscillated for 52 seconds at people who had asked for no motion,
+under a stylesheet that looked like it had covered them. `gl.js` still repaints
+exactly once and stops, so those visitors get the composition without the drift.
 
-Because three files read the preference independently (`main.js`, `motion.js`,
-`ivy.js`), it is worth re-checking end to end rather than trusting the CSS. Note
-that the emulation has to be set **before** navigation — `main.js` and `ivy.js`
-capture `matchMedia(...).matches` as a boolean at module load, so flipping it
-afterwards changes nothing. Last measured, all correct:
+Because `main.js` and `motion.js` read the preference independently, it is worth
+re-checking end to end rather than trusting the CSS. Note that the emulation has
+to be set **before** navigation — both capture `matchMedia(...).matches` as a
+boolean at module load, so flipping it afterwards changes nothing. Last measured,
+all correct:
 
 | | default | reduced |
 |---|---|---|
 | shader (mean pixel Δ over 2.2s) | 4.36 — animating | **0.000 — static** |
-| Ivy meter bar heights over 2.5s | changing | **byte-identical** |
 | grain / smooth scroll | on / `smooth` | `none` / `auto` |
 | reveals fired | 24/24 | 24/24 |
 
@@ -542,14 +540,12 @@ instead. The custom cursor is also a false alarm: `cursor()` returns early under
 reduced motion so `body.cursor-live` is never added, and both cursor elements sit
 at `opacity: 0` despite computing to `display: block`.
 
-**The Ivy lyrics are deliberately *not* an `aria-live` region**
-They're captions for audio already speaking those exact words. A live region
-would double-speak every line. The overlay is `role="dialog"` + labelled, with
-focus sent to the skip button.
-
-**`.ivy-words` is `display: block`, not flex**
-A flex container discards whitespace-only nodes, so word spacing came from
-`gap` alone and `textContent` read `"I'llbeyourguidetonight."`
+**A flex container discards whitespace-only text nodes**
+The intro split its captions into one `<span>` per word inside a flex parent, so
+the spacing came from `gap` alone and `textContent` read
+`"I'llbeyourguidetonight."` — invisible on screen, wrong to anything reading the
+DOM. Any per-word or per-character split needs `display: block` on the container,
+which is why `.split-line` and `.hero-title` are laid out that way.
 
 **The vignette stays under `prefers-contrast: more`**
 It looks decorative but it darkens the frame, which *helps* text near the
@@ -569,81 +565,39 @@ becomes scrollable as a floor for the shortest devices. Portrait is untouched.
 
 **The gate was the worse version of the same bug** and is fixed in the same
 block. Its portrait stack — a 168px orb with 2.6rem/3rem margins — overran a
-~390px landscape viewport and pushed **"Enter" mostly below the fold with "Skip
-intro" entirely off-screen**. Since the gate is `position: fixed` and is the only
-way into the site, a first-time visitor holding their phone in landscape had no
-reachable way in. The landscape block now sizes the orb off the short axis
-(`19vh`), shrinks the stack margins, and trims the button padding so orb +
-wordmark + sub + both buttons clear the fold at 360–430px tall (verified: nothing
-clipped, `gateScrolls` false). The intro itself was already fine in landscape —
-only the gate blocked reaching it. This is the kind of defect that hides from
-every automated check (valid HTML, passing axe, no console errors) and only
-shows up by *rendering the state and looking*.
+~390px landscape viewport and pushed **"Enter" mostly below the fold**. Since the
+gate is `position: fixed` and is the only way into the site, a first-time visitor
+holding their phone in landscape had no reachable way in. The landscape block now
+sizes the orb off the short axis (`19vh`), shrinks the stack margins, and trims
+the button padding so orb + wordmark + sub + button clear the fold at 360–430px
+tall (verified: nothing clipped, `gateScrolls` false). This is the kind of defect
+that hides from every automated check (valid HTML, passing axe, no console errors)
+and only shows up by *rendering the state and looking*.
 
 **The whole keyboard path is driven and verified, not assumed**
 
 | path | result |
 |---|---|
 | tab order | skip link → nav → hero buttons → platform cards → player; every stop paints the `2px solid #ff2442` focus ring |
-| gate | two-stop trap (Enter / Skip intro) that wraps; `Enter` activates and starts the intro identically to a mouse click |
+| gate | the dialog takes focus on `.ready`, Tab reaches *Enter*, and `Enter` activates it identically to a mouse click — fully revealing the site (`shell.live`, `inert` removed, `is-locked` cleared, page scrollable) |
 | drawer | opens with `aria-expanded="true"` and focus on the current link; Tab cycles the 5 links **plus the burger** and wraps; `Escape` closes and returns focus to the burger |
-| intro | `Escape` skips and fully reveals the site — `shellLive`, `inert` removed, `is-locked` cleared, page scrollable |
-| intro, early | `Escape` pressed inside the 380 ms defer before `ivy.start()` also reveals correctly — this is what `skipRequested` is for |
 
 Use CDP `keyDown`, **not `rawKeyDown`**, for any key that activates something.
 `rawKeyDown` delivers the event to listeners but does not run the browser's
 default action, so `Enter` on a focused button never produces a click. The page
-then sits in a half-started state that reads exactly like a bug: the intro
-appears to begin and then strand itself with the site never revealed. Pair it
-with `text` for printable keys.
+then sits in a half-started state that reads exactly like a bug — the gate never
+hands over and the site is never revealed. Pair it with `text` for printable keys.
 
 **Active nav carries `aria-current`, computed from scroll position**
 An `IntersectionObserver` band cannot work here: the last section never reaches
 the middle of the viewport, so `#connect` was structurally unreachable and the
 nav stayed stale for the whole final screen.
 
-### The intro
-
-**Completion listens for the audio `ended` event *and* polls in rAF**
-Not redundant. rAF throttles or stops in a backgrounded tab, and a visitor who
-switched tabs mid-intro could return to a permanently stuck overlay with the
-site locked behind it.
-
-**Skip intent is latched (`skipRequested`), not read off the DOM**
-`ivy.start()` is deferred ~380ms behind the gate's fade. Pressing Escape inside
-that window used to do nothing — the handler bailed because `#ivy` was still
-hidden — and the visitor then sat through all 52 seconds. `abortIntro()` now
-cancels the pending start, so skipping early also means the 1.1MB mp3 is never
-fetched at all.
-
-**`runFallback()` is latched**
-Both the `error` listener and the load guard can reach it. Without the latch
-each starts its own timer set and rAF loop, and the two fight — lyrics jump and
-the progress bar runs backwards.
-
-**Cue timings** were checked against a band-passed envelope of the mp3. Anchors
-align within 0.25s with no drift.
-
-> The intro is **fully captioned.** An earlier analysis of mine flagged
-> 40.7–43.4s and 44.1–47.5s as possible uncaptioned speech, on the basis that
-> they carry 3–8 Hz amplitude modulation similar to the spoken lines. That was
-> wrong: the script embedded in the file's own `lyrics-eng` tag ends at
-> "Let me show you everything." followed by `[Echoing fade out, dark ambient
-> outro]`. An echoing outro modulates at speech-like rates. Read the tag before
-> trusting envelope analysis:
-> `ffprobe -show_entries format_tags=lyrics-eng ivy-intro.mp3`
->
-> That tag no longer exists — the file's metadata was stripped to remove an
-> unused 22 KB embedded cover image. The **tagged original is preserved in git
-> history** (`git show <pre-rewrite-commit>:ivy-intro.mp3`), and the full script
-> including its stage directions is transcribed in the comment above `CUES` in
-> `js/ivy.js`.
-
 ### Performance
 
-**`<link rel="modulepreload">` for all four JS files**
+**`<link rel="modulepreload">` for all three JS files**
 ES module imports are only discovered after the entry module parses. On 3G the
-three imports didn't start until 3775ms. Preloading: they start at 501ms
+imports didn't start until 3775ms. Preloading: they start at 501ms
 together. Measured on a gzip-serving host: gate ready 5.4s → **3.6s**.
 
 **Analytics is queued immediately but fetched at idle**
@@ -669,10 +623,10 @@ simply ignored — it cannot break anything.
 **Instrument Serif is requested as `ital@0;1` and both variants are genuinely used.**
 It arrives as two files (~15 KB each) and looks like an easy 15 KB saving, because the
 serif reads as "the italic one" — `.hero-lede`, `.prose em`, `.prose .drop`,
-`.pullquote p` and 404's `.lost-say` are all italic. But **`.ivy-line`** (the intro
-captions, the largest type in the whole experience) and **`.pullquote::before`** (the
-giant decorative `"`) are *roman*. Dropping to `ital@1` would silently swap the intro
-captions to Georgia. Checked rule-by-rule; do not "optimise" this.
+`.pullquote p` and 404's `.lost-say` are all italic. But **`.pullquote::before`** — the
+16rem decorative `"` — is *roman*, and it is the largest glyph on the page. Dropping to
+`ital@1` would silently swap it to Georgia. Checked rule-by-rule; do not "optimise"
+this.
 
 **The shader renders below native resolution** (0.62 desktop / 0.5 coarse) with
 fewer fbm octaves on touch devices. The field is low-frequency; nobody can tell.
@@ -705,60 +659,28 @@ content sections are transparent and only `body` is opaque (behind the canvas), 
 the dimmed atmosphere and embers are genuinely visible through every section.
 Pausing the shader on scroll would flatten a visible background — don't.
 
-**The audio is fetched on intent, never speculatively** — measured on the network, not
-inferred: **0 requests** for `ivy-intro.mp3` at page load, **0** at `#gate.ready`, **0**
-after idling 2.5s on the gate, and exactly **1**, about **1.0s after *Enter* is pressed**.
-There is no `<audio>` element in the markup at all; `ivy.js` constructs it. So a visitor
-who lands, reads the gate and takes *Skip intro* — or any returning visitor, or any deep
-link — pays **0 KB** of it. The 1.1 MB lands only on people who chose the intro, which is
-worth remembering when weighing the re-encode question below.
+**Every visitor now downloads the same page.** The intro's 1.1 MB voice track used
+to be 70% of a first visit and made *Enter* a 3.4× heavier path than `?nointro=1`;
+with it gone there is one number, and no media at all:
 
-**Every other number here describes `?nointro=1`. A real first visit is 3.4×
-heavier**, because clicking *Enter* fetches `ivy-intro.mp3`:
+| | every load |
+|---|---|
+| fonts | 210 KB — 45% |
+| `gtag.js` | 163 KB — 35% |
+| this repo | 90 KB — 19% |
+| **total** | **~463 KB** |
 
-| | first visit | `?nointro=1` |
-|---|---|---|
-| `ivy-intro.mp3` | 1110 KB — **70%** | not fetched |
-| fonts | 210 KB — 13% | 45% |
-| `gtag.js` | 163 KB — 10% | 35% |
-| this repo | 95 KB — 6% | 20% |
-| **total** | **1579 KB** | **469 KB** |
+**Wait for `#gate.ready`, not just for `#gate-enter` to exist**, in any script that
+drives the entrance. The button is in the DOM and has a box well before the gate
+finishes its entrance, and a click landing in that window does nothing at all — no
+error, no state change, and downstream it reads like broken UI rather than a
+mistimed click.
 
-The audio dominates, and it is already about as small as it can honestly get:
-no ID3 tags (already stripped), already **VBR** (11 distinct frame sizes, so the
-encoder is allocating bits adaptively — there is no constant-bitrate waste to
-reclaim), and genuinely stereo (the side channel sits 15 dB under the mid, so
-folding to mono would audibly narrow the ambience). It is also *already lossy* at
-175 kbps with a ~19 kHz lowpass, so every further option is a generational
-re-encode of the artist's voice, not a free win. Measured, if it is ever wanted:
-LAME `-q:a 4` → 942 KB (−17%), `128k` → 829 KB (−27%), `-q:a 6` → 635 KB (−44%).
-Gross spectral measures cannot tell these apart (energy >16 kHz is already 36 dB
-down and moves <1.5 dB across all of them); what separates them is pre-echo and
-mid-band quantisation noise, which needs ears, not `ffmpeg`. **That makes it a
-quality call for the artist, not a build decision.**
-
-**It streams — do not "fix" the buffering.** Playback starts 1.9 s in on Slow 3G
-off ~15 KB buffered, so the 6-second text-only guard never fires, and at 175 kbps
-against Slow 3G's 400 kbps the download runs 2.3× realtime and will not stall.
-Two things will silently ruin any measurement of the intro:
-
-- **Drive it with CDP `Input.dispatchMouseEvent`.** A `.click()` from
-  `Runtime.evaluate` is not a trusted gesture, autoplay is refused, and every
-  connection looks like it falls back to the silent captions.
-- **Wait for `#gate .ready`, not just for `#gate-enter` to exist.** The button is
-  in the DOM and has a box well before the gate finishes its entrance, and a
-  click landing in that window does nothing at all — no error, no state change.
-  `#ivy` then stays `hidden`, so everything inside it has a `display: none`
-  ancestor and its CSS animations never start. That reads downstream as broken
-  UI: `#ivy-skip` sat at `opacity: 0` for 18 s straight and looked like a dead
-  affordance, when in fact it fades in correctly 2.4 s after `#ivy` is shown.
-
-**Once the audio is out of the picture the four web fonts are the largest thing
-left — ~210 KB — and every obvious way to cut them is a trap.** On the
-`?nointro=1` load that is 45% against `gtag.js` 35% and this repo's own files
-just 20%: four fifths of it is third-party, and neither part is worth what it
-looks like it is worth cutting. All four families were measured; do not repeat
-the experiments.
+**The four web fonts are the largest thing on the page — ~210 KB — and every obvious
+way to cut them is a trap.** That is 45% against `gtag.js` 35% and this repo's own
+files just 19%: four fifths of it is third-party, and neither part is worth what it
+looks like it is worth cutting. All four families were measured; do not repeat the
+experiments.
 
 | family | bytes | why it is that size |
 |---|---|---|
@@ -776,11 +698,10 @@ the experiments.
   wider and the footer CTA 14% wider — side by side the condensed display cut
   that carries the site's identity is plainly gone. `wdth` costs about the same
   and is even more load-bearing (13 declarations, values 75–88).
-- **Do not change `Instrument+Serif:ital@0;1` to `ital@1`.** Five of five
-  *rendered* serif elements are italic, so roman looks unused — it isn't.
-  `.ivy-line` sets no `font-style`, so the entire intro caption track is roman,
-  and it does not render under `?nointro=1` where you would go looking. Dropping
-  `ital@0` silently drops every caption to Georgia.
+- **Do not change `Instrument+Serif:ital@0;1` to `ital@1`.** Every serif element
+  you notice is italic, so roman looks unused — it isn't. `.pullquote::before`
+  sets no `font-style`, so the 16rem decorative `"` is roman; dropping `ital@0`
+  silently swaps the largest glyph on the page to Georgia.
 - **`&text=` subsetting** would cut Bricolage hard, but this README teaches the
   owner to edit copy freely; a new era name or platform would silently lose
   glyphs. Not worth the trap.
@@ -1001,12 +922,11 @@ What matters is the outcome, not the tool. After any edit, the site should still
 have **no console errors**, **no contrast failures**, and **no horizontal
 scroll** at phone and desktop width.
 
-**To see the gate or the intro at all, use `?ivy=1`.** `?nointro=1` hides both, and
-after one visit `sessionStorage['obsessn:seen']` sends you straight in — so a reused
-browser profile silently shows you the shell while you think you are testing the gate.
-The symptom is every gate element reporting a 0×0 rect (`getBoundingClientRect` returns
-zeros for `display: none`). `?ivy=1` is the force-intro flag the footer replay link uses
-and it ignores both the session flag and a deep link.
+**To see the gate at all, clear `sessionStorage['obsessn:seen']`** (or open a fresh
+profile / private window). `?nointro=1` hides it deliberately, and after one visit the
+session flag sends you straight in — so a reused browser profile silently shows you the
+shell while you think you are testing the gate. The symptom is every gate element
+reporting a 0×0 rect (`getBoundingClientRect` returns zeros for `display: none`).
 
 **With nothing installed** — open `http://localhost:4321/?nointro=1` after
 `python3 -m http.server 4321` and use Chrome DevTools:

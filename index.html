@@ -52,17 +52,16 @@
 <link rel="stylesheet" href="styles.css">
 
 <!-- The module graph is only discovered after main.js parses, which on a
-     high-latency link delayed the three imports by seconds. Preload them so
+     high-latency link delayed the two imports by seconds. Preload them so
      they start alongside it. -->
 <link rel="modulepreload" href="js/main.js">
 <link rel="modulepreload" href="js/gl.js">
-<link rel="modulepreload" href="js/ivy.js">
 <link rel="modulepreload" href="js/motion.js">
 
 <noscript><style>
   /* No JS: the preloader never completes and the shell never gets .live,
      so without this the visitor stares at a black screen forever. */
-  .preloader, .gate, .ivy, .cursor-dot, .cursor-ring { display: none !important; }
+  .preloader, .gate, .cursor-dot, .cursor-ring { display: none !important; }
   .shell { opacity: 1 !important; }
   [data-reveal], .split-line > i, .hero-title .ch { opacity: 1 !important; transform: none !important; }
   /* No JS also means no gl.js, so nothing ever adds .no-gl and the painted sky that
@@ -150,38 +149,23 @@
 <!-- tabindex="-1" so the dialog itself can take focus when it opens (see main.js);
      not tabbable, so it never joins the tab sequence. -->
 <div class="gate" id="gate" role="dialog" aria-modal="true" tabindex="-1"
-     aria-label="Enter The Obsessn — Ivy will introduce the site.">
+     aria-label="Enter The Obsessn">
   <div class="gate-inner">
     <div class="gate-orb">
       <div class="gate-orb-glow"></div>
       <img src="assets/logo-512.webp" alt="The Obsessn" width="512" height="512" fetchpriority="high">
     </div>
     <p class="gate-word">The Obsessn</p>
-    <p class="gate-sub">Sound on — Ivy is waiting</p>
+    <p class="gate-sub">No defined genre</p>
     <button class="gate-btn" id="gate-enter" data-magnet>
       <span class="tri"></span>
       <span>Enter</span>
     </button>
-    <button class="gate-skip" id="gate-skip">Skip intro</button>
   </div>
-</div>
-
-<!-- ══════ IVY INTRO ══════ -->
-<div class="ivy" id="ivy" hidden role="dialog" aria-modal="true"
-     aria-label="Ivy — spoken introduction. Press Escape to skip.">
-  <div class="ivy-badge">
-    <span class="ivy-pip"></span>
-    <span class="ivy-name">Ivy</span>
-    <span class="ivy-state" id="ivy-state">connecting</span>
-  </div>
-  <div class="ivy-stage" id="ivy-stage"></div>
-  <div class="ivy-meter" id="ivy-meter" aria-hidden="true"></div>
-  <button class="ivy-skip" id="ivy-skip">Tap to skip</button>
-  <div class="ivy-progress"><span id="ivy-progress-fill"></span></div>
 </div>
 
 <!-- ══════ SITE ══════ -->
-<!-- tabindex="-1" so revealSite() can place the keyboard here when the gate/intro
+<!-- tabindex="-1" so revealSite() can place the keyboard here when the gate
      hands over; not tabbable, so it never appears in the tab sequence itself. -->
 <div class="shell" id="shell" tabindex="-1">
   <a href="#main" class="skip-link">Skip to content</a>

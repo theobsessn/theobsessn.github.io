@@ -3,7 +3,6 @@
    ============================================================ */
 
 import { createAtmosphere } from './gl.js';
-import { createIvy } from './ivy.js';
 import { splitText, reveals, cursor, magnets, tilts, nav, parallax, chrome } from './motion.js';
 
 const $ = (s) => document.querySelector(s);
@@ -15,8 +14,6 @@ const el = {
   preNum: $('#pre-num'),
   gate: $('#gate'),
   enter: $('#gate-enter'),
-  gateSkip: $('#gate-skip'),
-  ivy: $('#ivy'),
   shell: $('#shell'),
   canvas: $('#gl-canvas'),
 };
@@ -37,7 +34,7 @@ document.body.classList.add('is-locked');
 el.shell.setAttribute('inert', '');  // set here, not in markup — see the <noscript> block
 
 /* ---------- atmosphere ---------- */
-const atmosphere = createAtmosphere(el.canvas, { reducedMotion: RM });
+createAtmosphere(el.canvas, { reducedMotion: RM });
 
 /* ---------- static chrome (safe to build immediately) ---------- */
 splitText();
@@ -120,16 +117,14 @@ let revealed = false;
 function revealSite() {
   if (revealed) return;
   revealed = true;
-  atmosphere.setIvy(0);
-  atmosphere.setAudio(0);
   document.body.classList.remove('is-locked');
   el.shell.removeAttribute('inert');
   el.shell.classList.add('live');
-  // Both dialogs are dismissed by now, and whatever held the keyboard (#ivy-skip or
-  // #gate-skip) went with them — so the browser dumps focus on <body> and a keyboard
-  // visitor restarts from the top of the document with nothing announced. Put focus
-  // on the shell instead: it is tabindex="-1", so the next Tab still reaches the skip
-  // link exactly as before, but the position is ours rather than a fallback.
+  // The gate is dismissed by now and it held the keyboard, so the browser would
+  // otherwise dump focus on <body> and a keyboard visitor would restart from the top
+  // of the document with nothing announced. Put focus on the shell instead: it is
+  // tabindex="-1", so the next Tab still reaches the skip link exactly as before, but
+  // the position is ours rather than a fallback.
   // Same reasoning as the drawer's focus return in motion.js.
   el.shell.focus({ preventScroll: true });
   // a remapped legacy anchor needs scrolling by hand — see LEGACY_HASH
@@ -148,107 +143,36 @@ function revealSite() {
   });
 }
 
-/* ---------- ivy ---------- */
-const ivy = createIvy({
-  root: el.ivy,
-  stage: $('#ivy-stage'),
-  meterEl: $('#ivy-meter'),
-  stateEl: $('#ivy-state'),
-  progressEl: $('#ivy-progress-fill'),
-  onLevel: (v) => atmosphere.setAudio(v),
-  onEnd: revealSite,
-});
-
-// Drop ?ivy=1 once it has done its job, or every subsequent reload replays
-// the intro the visitor already sat through.
-function clearIvyParam() {
-  const url = new URL(location.href);
-  // Match the parameter, not the substring — `.includes('ivy')` also fired for
-  // ?notivy=1 and ?ivyleague=x, rewriting the URL for no reason.
-  if (!url.searchParams.has('ivy')) return;
-  url.searchParams.delete('ivy');
-  history.replaceState(null, '', url.pathname + (url.search || '') + url.hash);
-}
-
+/* ---------- gate ---------- */
 function dismissGate() {
   el.gate.classList.add('dismissed');
   setTimeout(() => { el.gate.hidden = true; }, 850);
 }
 
-// Ivy is scheduled a beat after the gate starts fading. A visitor who clicks
-// Enter and immediately changes their mind lands inside that window, so the
-// skip intent has to be durable rather than dropped.
-let introTimer = 0;
-let introStarted = false;
-let skipRequested = false;
-
-function enterWithIvy() {
+// The gate fades for 850ms; the shell starts crossing in halfway through it, so
+// the two dissolve into each other instead of cutting.
+function enterSite() {
   sessionStorage.setItem('obsessn:seen', '1');
-  clearIvyParam();
-  introStarted = true;
   dismissGate();
-  atmosphere.setIvy(1);
-  introTimer = setTimeout(() => {
-    if (skipRequested) return;
-    ivy.start();
-  }, 380);
-}
-
-// Skip, whether or not Ivy has actually appeared yet.
-function abortIntro() {
-  if (skipRequested) return;
-  skipRequested = true;
-  clearTimeout(introTimer);
-  if (!el.ivy.hidden) {
-    ivy.finish();
-  } else {
-    el.ivy.hidden = true;
-    revealSite();
-  }
-}
-
-function skipToSite() {
-  sessionStorage.setItem('obsessn:seen', '1');
-  clearIvyParam();
-  dismissGate();
-  el.ivy.hidden = true;
   setTimeout(revealSite, 420);
 }
 
-el.enter?.addEventListener('click', enterWithIvy);
-el.gateSkip?.addEventListener('click', skipToSite);
-
-// skipping the intro itself
-el.ivy?.addEventListener('click', abortIntro);
-addEventListener('keydown', (e) => {
-  // Only once the gate has handed over — before that, let the buttons do their
-  // own keyboard handling.
-  if (!introStarted || revealed) return;
-  if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    abortIntro();
-  }
-});
+el.enter?.addEventListener('click', enterSite);
 
 /* ---------- boot ---------- */
 cursor();
 
-// A deep link (theobsessn.com/#music) or ?nointro means they want the site, not the show.
-// Same for anyone returning inside the session — nobody sits through an intro twice.
+// A deep link (theobsessn.com/#music) or ?nointro means they want the site, not the
+// curtain. Same for anyone returning inside the session — the gate is an entrance,
+// and you only walk through it once.
 const deepLink = location.hash && location.hash !== '#top';
 const params = new URLSearchParams(location.search);
 const forceSkip = params.has('nointro');
-const forceIntro = params.has('ivy');            // shareable "watch the intro" link
-// The gate + Ivy intro are the first thing a new visitor gets — the artist asked for
-// them back after they were briefly taken off the path. Skipped for anyone who has
-// already seen it this session, for ?nointro=1, and for deep links: those visitors
-// asked for the site, not the show.
-const straightIn = !forceIntro && (deepLink || forceSkip || !!sessionStorage.getItem('obsessn:seen'));
+const straightIn = deepLink || forceSkip || !!sessionStorage.getItem('obsessn:seen');
 
 function openDirect() {
   el.gate.classList.add('dismissed');
   el.gate.hidden = true;
-  el.ivy.hidden = true;
   // The display fallback is roughly twice as wide as Bricolage, so swapping it
   // in reflows the whole wordmark. Give the real face a brief head start —
   // capped, so a slow font host can never hold the site hostage.
@@ -263,10 +187,9 @@ if (straightIn) {
 } else {
   preload().then(() => setTimeout(() => {
     el.gate.classList.add('ready');
-    // The gate is role="dialog" aria-modal="true" and it was the only one of the three
-    // dialogs here that never took the keyboard — the intro focuses #ivy-skip and the
-    // drawer focuses its first link, but this one left focus on <body>, so a screen
-    // reader was never told a dialog had opened.
+    // The gate is role="dialog" aria-modal="true" and it used to be the one dialog here
+    // that never took the keyboard — the drawer focuses its first link, but this one
+    // left focus on <body>, so a screen reader was never told a dialog had opened.
     // Focus the DIALOG, not #gate-enter: Chrome matches :focus-visible on programmatic
     // focus even when the last input was the mouse, so focusing the button painted a
     // bright crimson ring over the designed pill for every pointer visitor. Landing on
@@ -275,10 +198,3 @@ if (straightIn) {
     el.gate.focus({ preventScroll: true });
   }, 150));
 }
-
-// Replay the intro from the footer
-$('#replay-intro')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  sessionStorage.removeItem('obsessn:seen');
-  location.href = `${location.pathname}?ivy=1`;
-});
