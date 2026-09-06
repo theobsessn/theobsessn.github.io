@@ -36,6 +36,14 @@ streaming" label, an interview-style heading, and the genre chips
 ("Heavy Metal / Blues / Dark Pop / Synthwave / Alternative") that sat beside the
 biography portrait.
 
+The biography itself was cut down on 2026-09-06, again at the artist's request.
+The streaming-profile bio is longer; what stays here is the tagline and the three
+paragraphs about the name. Gone: the "almost 20 years" / genres paragraph, the
+stage-and-income paragraph, "For years, I was searching…", the
+mistakes-and-kindness paragraph, the "good" / "bad" line, and the "Stay kind"
+pull quote. **Do not restore them from Spotify/SoundCloud** — the shorter text is
+deliberate.
+
 Two consequences worth knowing before you "fix" something:
 
 - **The spoken intro ("Ivy") is gone, and stays gone.** A 52-second narrated
@@ -620,13 +628,14 @@ not "fix" it on that evidence.
 The wordmark is the LCP element. If Google re-versions that URL the preload is
 simply ignored — it cannot break anything.
 
-**Instrument Serif is requested as `ital@0;1` and both variants are genuinely used.**
-It arrives as two files (~15 KB each) and looks like an easy 15 KB saving, because the
-serif reads as "the italic one" — `.hero-lede`, `.prose em`, `.prose .drop`,
-`.pullquote p` and 404's `.lost-say` are all italic. But **`.pullquote::before`** — the
-16rem decorative `"` — is *roman*, and it is the largest glyph on the page. Dropping to
-`ital@1` would silently swap it to Georgia. Checked rule-by-rule; do not "optimise"
-this.
+**Instrument Serif is requested as `ital@0;1`; only the italic is used now.**
+`.hero-lede`, `.prose em`, `.prose .drop` and 404's `.lost-say` are all italic. The
+roman cut had exactly one user — the 16rem decorative `"` on the biography pull
+quote (`.pullquote::before`) — and that element went with the pull quote on
+2026-09-06. A browser fetches a `@font-face` only when some rendered text matches
+it, so the roman file is no longer downloaded either way (verified: one Instrument
+Serif request per page load). Trimming the request to `ital@1` would save a few
+bytes of Google's CSS and nothing else; it is left alone rather than churned.
 
 **The shader renders below native resolution** (0.62 desktop / 0.5 coarse) with
 fewer fbm octaves on touch devices. The field is low-frequency; nobody can tell.
@@ -698,10 +707,9 @@ experiments.
   wider and the footer CTA 14% wider — side by side the condensed display cut
   that carries the site's identity is plainly gone. `wdth` costs about the same
   and is even more load-bearing (13 declarations, values 75–88).
-- **Do not change `Instrument+Serif:ital@0;1` to `ital@1`.** Every serif element
-  you notice is italic, so roman looks unused — it isn't. `.pullquote::before`
-  sets no `font-style`, so the 16rem decorative `"` is roman; dropping `ital@0`
-  silently swaps the largest glyph on the page to Georgia.
+- **`Instrument+Serif:ital@0;1` could now be `ital@1`, but there is nothing to
+  gain.** The roman cut's only user, `.pullquote::before`, was removed with the
+  pull quote on 2026-09-06, and an unused face is never fetched. Left as-is.
 - **`&text=` subsetting** would cut Bricolage hard, but this README teaches the
   owner to edit copy freely; a new era name or platform would silently lose
   glyphs. Not worth the trap.

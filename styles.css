@@ -1014,48 +1014,6 @@ smaller margin. */
   margin: 3rem 0;
 }
 
-.pullquote {
-  position: relative;
-  margin-top: clamp(3rem, 8vw, 6rem);
-  padding: clamp(2rem, 5vw, 3.4rem);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--hairline-warm);
-  background:
-    radial-gradient(ellipse 90% 120% at 15% 0%, rgba(200,16,46,0.14), transparent 60%),
-    var(--surface-1);
-  overflow: hidden;
-}
-.pullquote::before {
-  content: '"';
-  position: absolute;
-  top: -0.32em;
-  right: 0.1em;
-  font-family: var(--font-serif);
-  font-size: 16rem;
-  line-height: 1;
-  color: rgba(255, 36, 66, 0.07);
-  pointer-events: none;
-}
-.pullquote p {
-  position: relative;
-  font-family: var(--font-serif);
-  font-size: var(--t-lg);
-  font-style: italic;
-  line-height: 1.35;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-.pullquote cite {
-  display: block;
-  margin-top: 1.5rem;
-  font-family: var(--font-mono);
-  font-size: var(--t-micro);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--crimson-text);
-  font-style: normal;
-}
-
 @media (max-width: 760px) {
   .sec-head { flex-direction: column; align-items: stretch; gap: 1.1rem; }
 }
@@ -1516,7 +1474,7 @@ and pull the
     color: rgba(244, 239, 233, 0.40);
     -webkit-text-fill-color: rgba(244, 239, 233, 0.40);
   }
-  .plat, .social, .player, .pullquote, .about-portrait { border-color: rgba(255, 255, 255, 0.34); }
+  .plat, .social, .player, .about-portrait { border-color: rgba(255, 255, 255, 0.34); }
 }
 
 /* ---------- 18b3. REDUCED TRANSPARENCY ----------
@@ -1568,7 +1526,7 @@ and pull the
   .hero-title .ch { color: CanvasText !important; }
 
   /* these lean on colour alone to read as surfaces */
-  .plat, .social, .player, .player-frame, .pullquote, .about-portrait {
+  .plat, .social, .player, .player-frame, .about-portrait {
     border: 1px solid CanvasText;
   }
   .social-go, .plat-go { border-color: CanvasText; }
@@ -1648,7 +1606,7 @@ so the dark theme would send
   .about-portrait { max-width: 130px; margin-bottom: 1rem; }
   .about-sticky { position: static; }
 
-  .plat, .social, .pullquote, .sec-head {
+  .plat, .social, .sec-head {
     break-inside: avoid;
     border: 1px solid #ccc;
   }
@@ -1668,16 +1626,9 @@ so the dark theme would send
      atmosphere behind it. On paper there is no atmosphere, and with "Background
      graphics" ticked it printed as a full-width near-black slab that swallowed its
      own text — measured as low as 1.77:1 against the 4.5:1 AA needs — and dumped
-     toner across a whole page.
-
-     .pullquote needs the same treatment for the same reason. The token overrides at
-     the top of this block (--surface-1 / --bg-card -> transparent) neutralise every
-     other surface, but .pullquote re-declares the whole `background` shorthand with
-     a crimson radial gradient, so the token never reaches it. Measured in print
-     media: it was the ONLY element on the page still computing a background-image,
-     printing the quote on a pink wash. */
-  .footer,
-  .pullquote { background: none !important; }
+     toner across a whole page. (The biography pull quote needed the same rule for
+     the same reason until it was removed on 2026-09-06.) */
+  .footer { background: none !important; }
 
   /* A printed link is useless without its destination. This was enumerated by class and
      so it missed the two most important links on the sheet: BOTH "Listen on Spotify"
